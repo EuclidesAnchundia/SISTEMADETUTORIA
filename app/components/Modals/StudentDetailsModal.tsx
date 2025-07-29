@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   X,
   User,
@@ -13,18 +13,22 @@ import {
   XIcon,
   Clock,
   Send,
-} from "lucide-react"
-import { useSystem } from "../../contexts/SystemContext"
-import { useAuth } from "../../contexts/AuthContext"
+} from "lucide-react";
+import { useSystem } from "../../contexts/SystemContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface StudentDetailsModalProps {
-  isOpen: boolean
-  onClose: () => void
-  student: any
+  isOpen: boolean;
+  onClose: () => void;
+  student: any;
 }
 
-export default function StudentDetailsModal({ isOpen, onClose, student }: StudentDetailsModalProps) {
-  const { user } = useAuth()
+export default function StudentDetailsModal({
+  isOpen,
+  onClose,
+  student,
+}: StudentDetailsModalProps) {
+  const { user } = useAuth();
   const {
     tutorias,
     temas,
@@ -34,87 +38,101 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
     createNotification,
     getFilesByStudent,
     getThemeByStudent,
-  } = useSystem()
+  } = useSystem();
 
-  const [activeTab, setActiveTab] = useState("resumen")
-  const [message, setMessage] = useState("")
-  const [themeObservations, setThemeObservations] = useState("")
-  const [tutoriaObservations, setTutoriaObservations] = useState("")
+  const [activeTab, setActiveTab] = useState("resumen");
+  const [message, setMessage] = useState("");
+  const [themeObservations, setThemeObservations] = useState("");
+  const [tutoriaObservations, setTutoriaObservations] = useState("");
 
-  if (!isOpen || !student) return null
+  if (!isOpen || !student) return null;
 
-  const studentTutorias = tutorias.filter((t) => t.estudianteEmail === student.email)
-  const studentTheme = getThemeByStudent(student.email)
-  const studentFiles = getFilesByStudent(student.email)
+  const studentTutorias = tutorias.filter(
+    (t) => t.estudianteEmail === student.email,
+  );
+  const studentTheme = getThemeByStudent(student.email);
+  const studentFiles = getFilesByStudent(student.email);
 
   const handleApproveTheme = () => {
     if (studentTheme) {
-      updateTema(studentTheme.id, { aprobado: true })
+      updateTema(studentTheme.id, { aprobado: true });
       createNotification(
         student.email,
         "TEMA_APROBADO",
         `Tu tema "${studentTheme.titulo}" ha sido aprobado por tu tutor`,
         { observaciones: themeObservations },
-      )
-      setThemeObservations("")
+      );
+      setThemeObservations("");
     }
-  }
+  };
 
   const handleRejectTheme = () => {
     if (studentTheme && themeObservations.trim()) {
-      updateTema(studentTheme.id, { aprobado: false })
-      createNotification(student.email, "TEMA_RECHAZADO", `Tu tema "${studentTheme.titulo}" necesita revisión`, {
-        observaciones: themeObservations,
-      })
-      setThemeObservations("")
+      updateTema(studentTheme.id, { aprobado: false });
+      createNotification(
+        student.email,
+        "TEMA_RECHAZADO",
+        `Tu tema "${studentTheme.titulo}" necesita revisión`,
+        {
+          observaciones: themeObservations,
+        },
+      );
+      setThemeObservations("");
     }
-  }
+  };
 
   const handleTutoriaAction = (tutoriaId: string, action: string) => {
-    const tutoria = studentTutorias.find((t) => t.id === tutoriaId)
-    if (!tutoria) return
+    const tutoria = studentTutorias.find((t) => t.id === tutoriaId);
+    if (!tutoria) return;
 
     if (action === "aceptar") {
-      updateTutoria(tutoriaId, { estado: "aceptada" })
+      updateTutoria(tutoriaId, { estado: "aceptada" });
     } else if (action === "rechazar" && tutoriaObservations.trim()) {
       updateTutoria(tutoriaId, {
         estado: "rechazada",
         motivoRechazo: tutoriaObservations,
-      })
+      });
     } else if (action === "completar") {
       updateTutoria(tutoriaId, {
         estado: "completada",
         observaciones: tutoriaObservations,
-      })
+      });
     }
-    setTutoriaObservations("")
-  }
+    setTutoriaObservations("");
+  };
 
   const handleSendMessage = () => {
     if (message.trim()) {
-      createNotification(student.email, "MENSAJE_TUTOR", `Mensaje de tu tutor: ${message}`, {
-        tutor: `${user?.nombres} ${user?.apellidos}`,
-      })
-      setMessage("")
+      createNotification(
+        student.email,
+        "MENSAJE_TUTOR",
+        `Mensaje de tu tutor: ${message}`,
+        {
+          tutor: `${user?.nombres} ${user?.apellidos}`,
+        },
+      );
+      setMessage("");
     }
-  }
+  };
 
   const downloadFile = (archivo: any) => {
-    const link = document.createElement("a")
-    link.href = archivo.contenido
-    link.download = archivo.nombre
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+    const link = document.createElement("a");
+    link.href = archivo.contenido;
+    link.download = archivo.nombre;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const sizes = ["Bytes", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
-  }
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (
+      Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+    );
+  };
 
   const tabs = [
     { id: "resumen", label: "Resumen", icon: User },
@@ -122,7 +140,7 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
     { id: "tutorias", label: "Tutorías", icon: BookOpen },
     { id: "archivos", label: "Archivos", icon: FileText },
     { id: "indicaciones", label: "Indicaciones", icon: MessageSquare },
-  ]
+  ];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -142,7 +160,10 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
                 <p className="text-red-200 text-sm">{student.email}</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors">
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
+            >
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -152,7 +173,7 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8 px-6">
             {tabs.map((tab) => {
-              const Icon = tab.icon
+              const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
@@ -166,7 +187,7 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
                   <Icon className="h-4 w-4" />
                   {tab.label}
                 </button>
-              )
+              );
             })}
           </nav>
         </div>
@@ -182,16 +203,24 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
                     <span className="font-medium text-blue-900">Tutorías</span>
                   </div>
                   <p className="text-2xl font-bold text-blue-600">
-                    {studentTutorias.filter((t) => t.estado === "completada").length}/{studentTutorias.length}
+                    {
+                      studentTutorias.filter((t) => t.estado === "completada")
+                        .length
+                    }
+                    /{studentTutorias.length}
                   </p>
                   <p className="text-sm text-blue-700">Completadas</p>
                 </div>
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <FileText className="h-5 w-5 text-purple-600" />
-                    <span className="font-medium text-purple-900">Archivos</span>
+                    <span className="font-medium text-purple-900">
+                      Archivos
+                    </span>
                   </div>
-                  <p className="text-2xl font-bold text-purple-600">{studentFiles.length}</p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    {studentFiles.length}
+                  </p>
                   <p className="text-sm text-purple-700">Subidos</p>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg">
@@ -200,20 +229,31 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
                     <span className="font-medium text-green-900">Tema</span>
                   </div>
                   <p className="text-lg font-bold text-green-600">
-                    {studentTheme ? (studentTheme.aprobado ? "Aprobado" : "Pendiente") : "Sin tema"}
+                    {studentTheme
+                      ? studentTheme.aprobado
+                        ? "Aprobado"
+                        : "Pendiente"
+                      : "Sin tema"}
                   </p>
                 </div>
               </div>
 
               {/* Recent Activity */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Actividad Reciente</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Actividad Reciente
+                </h3>
                 <div className="space-y-3">
                   {studentTutorias.slice(0, 3).map((tutoria) => (
-                    <div key={tutoria.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div
+                      key={tutoria.id}
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                    >
                       <Clock className="h-4 w-4 text-gray-500" />
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">{tutoria.asunto}</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {tutoria.asunto}
+                        </p>
                         <p className="text-xs text-gray-500">
                           {tutoria.fecha} - {tutoria.hora}
                         </p>
@@ -244,25 +284,40 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
                 <div>
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900">Tema Propuesto</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Tema Propuesto
+                      </h3>
                       <span
                         className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          studentTheme.aprobado ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                          studentTheme.aprobado
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
-                        {studentTheme.aprobado ? "Aprobado" : "Pendiente de revisión"}
+                        {studentTheme.aprobado
+                          ? "Aprobado"
+                          : "Pendiente de revisión"}
                       </span>
                     </div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-3">{studentTheme.titulo}</h4>
-                    <p className="text-gray-700 mb-4">{studentTheme.descripcion}</p>
+                    <h4 className="text-xl font-bold text-gray-900 mb-3">
+                      {studentTheme.titulo}
+                    </h4>
+                    <p className="text-gray-700 mb-4">
+                      {studentTheme.descripcion}
+                    </p>
                     <p className="text-sm text-gray-500">
-                      Registrado el: {new Date(studentTheme.fechaRegistro).toLocaleDateString()}
+                      Registrado el:{" "}
+                      {new Date(
+                        studentTheme.fechaRegistro,
+                      ).toLocaleDateString()}
                     </p>
                   </div>
 
                   {!studentTheme.aprobado && (
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <h4 className="font-medium text-gray-900 mb-3">Gestionar Tema</h4>
+                      <h4 className="font-medium text-gray-900 mb-3">
+                        Gestionar Tema
+                      </h4>
                       <textarea
                         value={themeObservations}
                         onChange={(e) => setThemeObservations(e.target.value)}
@@ -293,8 +348,12 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
               ) : (
                 <div className="text-center py-8">
                   <GraduationCap className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Sin tema registrado</h3>
-                  <p className="text-gray-500">El estudiante aún no ha registrado un tema de titulación.</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Sin tema registrado
+                  </h3>
+                  <p className="text-gray-500">
+                    El estudiante aún no ha registrado un tema de titulación.
+                  </p>
                 </div>
               )}
             </div>
@@ -305,14 +364,23 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
               {studentTutorias.length === 0 ? (
                 <div className="text-center py-8">
                   <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Sin tutorías registradas</h3>
-                  <p className="text-gray-500">El estudiante aún no ha solicitado tutorías.</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Sin tutorías registradas
+                  </h3>
+                  <p className="text-gray-500">
+                    El estudiante aún no ha solicitado tutorías.
+                  </p>
                 </div>
               ) : (
                 studentTutorias.map((tutoria) => (
-                  <div key={tutoria.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div
+                    key={tutoria.id}
+                    className="bg-white border border-gray-200 rounded-lg p-4"
+                  >
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold text-gray-900">{tutoria.asunto}</h4>
+                      <h4 className="font-semibold text-gray-900">
+                        {tutoria.asunto}
+                      </h4>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           tutoria.estado === "completada"
@@ -337,21 +405,27 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
                       <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                         <textarea
                           value={tutoriaObservations}
-                          onChange={(e) => setTutoriaObservations(e.target.value)}
+                          onChange={(e) =>
+                            setTutoriaObservations(e.target.value)
+                          }
                           placeholder="Observaciones (requerido para rechazar)"
                           className="w-full p-2 border border-gray-300 rounded mb-3 text-sm"
                           rows={2}
                         />
                         <div className="flex gap-2">
                           <button
-                            onClick={() => handleTutoriaAction(tutoria.id, "aceptar")}
+                            onClick={() =>
+                              handleTutoriaAction(tutoria.id, "aceptar")
+                            }
                             className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors"
                           >
                             <Check className="h-3 w-3" />
                             Aceptar
                           </button>
                           <button
-                            onClick={() => handleTutoriaAction(tutoria.id, "rechazar")}
+                            onClick={() =>
+                              handleTutoriaAction(tutoria.id, "rechazar")
+                            }
                             disabled={!tutoriaObservations.trim()}
                             className="flex items-center gap-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white px-3 py-1 rounded text-sm transition-colors"
                           >
@@ -366,13 +440,17 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
                       <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                         <textarea
                           value={tutoriaObservations}
-                          onChange={(e) => setTutoriaObservations(e.target.value)}
+                          onChange={(e) =>
+                            setTutoriaObservations(e.target.value)
+                          }
                           placeholder="Observaciones de la tutoría completada"
                           className="w-full p-2 border border-gray-300 rounded mb-3 text-sm"
                           rows={2}
                         />
                         <button
-                          onClick={() => handleTutoriaAction(tutoria.id, "completar")}
+                          onClick={() =>
+                            handleTutoriaAction(tutoria.id, "completar")
+                          }
                           className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors"
                         >
                           <Check className="h-3 w-3" />
@@ -384,7 +462,8 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
                     {tutoria.observaciones && (
                       <div className="mt-3 p-3 bg-green-50 rounded-lg">
                         <p className="text-sm text-green-800">
-                          <strong>Observaciones:</strong> {tutoria.observaciones}
+                          <strong>Observaciones:</strong>{" "}
+                          {tutoria.observaciones}
                         </p>
                       </div>
                     )}
@@ -392,7 +471,8 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
                     {tutoria.motivoRechazo && (
                       <div className="mt-3 p-3 bg-red-50 rounded-lg">
                         <p className="text-sm text-red-800">
-                          <strong>Motivo de rechazo:</strong> {tutoria.motivoRechazo}
+                          <strong>Motivo de rechazo:</strong>{" "}
+                          {tutoria.motivoRechazo}
                         </p>
                       </div>
                     )}
@@ -407,17 +487,26 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
               {studentFiles.length === 0 ? (
                 <div className="text-center py-8">
                   <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Sin archivos subidos</h3>
-                  <p className="text-gray-500">El estudiante aún no ha subido archivos.</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Sin archivos subidos
+                  </h3>
+                  <p className="text-gray-500">
+                    El estudiante aún no ha subido archivos.
+                  </p>
                 </div>
               ) : (
                 studentFiles.map((archivo) => (
-                  <div key={archivo.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div
+                    key={archivo.id}
+                    className="bg-white border border-gray-200 rounded-lg p-4"
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <FileText className="h-8 w-8 text-red-600" />
                         <div>
-                          <h4 className="font-medium text-gray-900">{archivo.nombre}</h4>
+                          <h4 className="font-medium text-gray-900">
+                            {archivo.nombre}
+                          </h4>
                           <p className="text-sm text-gray-500">
                             {formatFileSize(archivo.tamaño)} • Subido el{" "}
                             {new Date(archivo.fechaSubida).toLocaleDateString()}
@@ -441,7 +530,9 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
           {activeTab === "indicaciones" && (
             <div className="space-y-4">
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-3">Enviar Indicaciones</h4>
+                <h4 className="font-medium text-gray-900 mb-3">
+                  Enviar Indicaciones
+                </h4>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -460,7 +551,9 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">💡 Consejos para las indicaciones</h4>
+                <h4 className="font-medium text-blue-900 mb-2">
+                  💡 Consejos para las indicaciones
+                </h4>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• Sé específico y constructivo en tus comentarios</li>
                   <li>• Proporciona ejemplos cuando sea posible</li>
@@ -473,5 +566,5 @@ export default function StudentDetailsModal({ isOpen, onClose, student }: Studen
         </div>
       </div>
     </div>
-  )
+  );
 }
