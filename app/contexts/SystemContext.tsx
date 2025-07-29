@@ -381,14 +381,34 @@ export function SystemProvider({ children }: { children: ReactNode }) {
   const getAllArchivos = () => archivos;
 
   const saveAsignacion = (asignacion: Asignacion): boolean => {
-    const existingIndex = asignaciones.findIndex((a) => a.id === asignacion.id);
-    if (existingIndex >= 0) {
-      setAsignaciones((prev) =>
-        prev.map((a, index) => (index === existingIndex ? asignacion : a)),
-      );
-    } else {
-      setAsignaciones((prev) => [...prev, asignacion]);
-    }
+    // Obtener estudiante y tutor a partir de email o ID
+    const estudiante = asignacion.estudianteId
+      ? usuarios.find((u) => u.id === asignacion.estudianteId)
+      : usuarios.find((u) => u.email === asignacion.estudianteEmail!);
+    const tutor = asignacion.tutorId
+      ? usuarios.find((u) => u.id === asignacion.tutorId)
+      : usuarios.find((u) => u.email === asignacion.tutorEmail!);
+
+    if (!estudiante || !tutor) return false;
+
+    const nuevaAsignacion: Asignacion = {
+      ...asignacion,
+      estudianteId: estudiante.id,
+      tutorId: tutor.id,
+      estudianteEmail: estudiante.email,
+      tutorEmail: tutor.email,
+    };
+
+    // Eliminar asignaciones previas del estudiante
+    setAsignaciones((prev) =>
+      prev.filter(
+        (a) =>
+          a.estudianteId !== estudiante.id &&
+          a.estudianteEmail !== estudiante.email,
+      ),
+    );
+
+    setAsignaciones((prev) => [...prev, nuevaAsignacion]);
     return true;
   };
 
@@ -401,18 +421,20 @@ export function SystemProvider({ children }: { children: ReactNode }) {
     studentId: string,
     tutorId: string,
   ): boolean => {
-    // Remove existing assignment if any
-    setAsignaciones((prev) => prev.filter((a) => a.estudianteId !== studentId));
+    const estudiante = usuarios.find((u) => u.id === studentId);
+    const tutor = usuarios.find((u) => u.id === tutorId);
+    if (!estudiante || !tutor) return false;
 
-    // Add new assignment
     const newAssignment: Asignacion = {
       id: generateId(),
       estudianteId: studentId,
       tutorId: tutorId,
+      estudianteEmail: estudiante.email,
+      tutorEmail: tutor.email,
       fechaAsignacion: new Date().toISOString(),
     };
-    setAsignaciones((prev) => [...prev, newAssignment]);
-    return true;
+
+    return saveAsignacion(newAssignment);
   };
 
   const removeAssignment = (studentId: string): boolean => {
@@ -437,12 +459,21 @@ export function SystemProvider({ children }: { children: ReactNode }) {
     const student = usuarios.find((u) => u.email === studentEmail);
     if (!student) return undefined;
 
-    // Then find the assignment using the student ID
-    const asignacion = asignaciones.find((a) => a.estudianteId === student.id);
+    // Buscar asignación por ID o email
+    const asignacion =
+      asignaciones.find((a) => a.estudianteId === student.id) ||
+      asignaciones.find((a) => a.estudianteEmail === student.email);
     if (!asignacion) return undefined;
 
-    // Finally find the tutor by ID
-    return usuarios.find((u) => u.id === asignacion.tutorId);
+    // Obtener tutor por ID o email
+    if (asignacion.tutorId) {
+      const tutor = usuarios.find((u) => u.id === asignacion.tutorId);
+      if (tutor) return tutor;
+    }
+    if (asignacion.tutorEmail) {
+      return usuarios.find((u) => u.email === asignacion.tutorEmail);
+    }
+    return undefined;
   };
 
   const getAssignedStudents = (tutorEmail: string): User[] => {
@@ -450,10 +481,16 @@ export function SystemProvider({ children }: { children: ReactNode }) {
     if (!tutor) return [];
 
     const tutorAsignaciones = asignaciones.filter(
-      (a) => a.tutorId === tutor.id,
+      (a) => a.tutorId === tutor.id || a.tutorEmail === tutor.email,
     );
     return tutorAsignaciones
-      .map((a) => usuarios.find((u) => u.id === a.estudianteId))
+      .map((a) => {
+        if (a.estudianteId)
+          return usuarios.find((u) => u.id === a.estudianteId);
+        if (a.estudianteEmail)
+          return usuarios.find((u) => u.email === a.estudianteEmail);
+        return undefined;
+      })
       .filter(Boolean) as User[];
   };
 
