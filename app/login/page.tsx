@@ -1,82 +1,89 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useAuth } from "../contexts/AuthContext"
-import { useSystem } from "../contexts/SystemContext"
-import { Mail, Lock, LogIn, GraduationCap } from "lucide-react"
-import { useToast } from "../components/ui/toast"
+import type React from "react";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../contexts/AuthContext";
+import { useSystem } from "../contexts/SystemContext";
+import { Mail, Lock, LogIn, GraduationCap } from "lucide-react";
+import { useToast } from "../components/ui/toast";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const { login } = useAuth()
-  const { validateEmailDomain, getUserByEmail } = useSystem()
-  const router = useRouter()
-  const { addToast } = useToast()
+  const { login } = useAuth();
+  const { validateEmailDomain, getUserByEmail } = useSystem();
+  const router = useRouter();
+  const { addToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     if (!email || !password) {
       addToast({
         type: "error",
         title: "Campos requeridos",
         description: "Por favor, completa todos los campos.",
-      })
-      setLoading(false)
-      return
+      });
+      setLoading(false);
+      return;
     }
 
-    const validDomains = ["@uleam.edu.ec", "@live.uleam.edu.ec", "@coordtit.uleam.edu.ec", "@admin.uleam.edu.ec"]
-    const isValidDomain = validDomains.some((domain) => email.endsWith(domain))
+    const validDomains = [
+      "@uleam.edu.ec",
+      "@live.uleam.edu.ec",
+      "@coordtit.uleam.edu.ec",
+      "@admin.uleam.edu.ec",
+    ];
+    const isValidDomain = validDomains.some((domain) => email.endsWith(domain));
 
     if (!isValidDomain) {
       addToast({
         type: "error",
         title: "Correo inválido",
-        description: "Debes ingresar un correo institucional válido de la ULEAM.",
-      })
-      setLoading(false)
-      return
+        description:
+          "Debes ingresar un correo institucional válido de la ULEAM.",
+      });
+      setLoading(false);
+      return;
     }
 
-    const success = await login(email, password)
+    const success = await login(email, password);
 
     if (success) {
       addToast({
         type: "success",
         title: "¡Bienvenido!",
         description: "Has iniciado sesión correctamente.",
-      })
-      router.push("/dashboard")
+      });
+      router.push("/dashboard");
     } else {
       // Verificar si el usuario existe pero la contraseña es incorrecta
-      const userExists = getUserByEmail(email)
+      const userExists = getUserByEmail(email);
       if (userExists) {
         addToast({
           type: "error",
           title: "Contraseña incorrecta",
           description: "La contraseña ingresada no es correcta.",
-        })
+        });
       } else {
         addToast({
           type: "error",
           title: "Usuario no encontrado",
-          description: "No existe un usuario registrado con este correo electrónico.",
-        })
+          description:
+            "No existe un usuario registrado con este correo electrónico.",
+        });
       }
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -101,11 +108,18 @@ export default function LoginPage() {
             <p className="text-gray-600">Accede a tu cuenta institucional</p>
           </div>
 
-          {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 <Mail size={16} className="inline mr-2" />
                 Correo Institucional
               </label>
@@ -120,7 +134,10 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 <Lock size={16} className="inline mr-2" />
                 Contraseña
               </label>
@@ -144,12 +161,18 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center space-y-2">
-            <Link href="/recover" className="text-red-600 hover:text-red-700 text-sm">
+            <Link
+              href="/recover"
+              className="text-red-600 hover:text-red-700 text-sm"
+            >
               ¿Olvidaste tu contraseña?
             </Link>
             <p className="text-gray-600 text-sm">
               ¿No tienes cuenta?{" "}
-              <Link href="/register" className="text-red-600 hover:text-red-700 font-medium">
+              <Link
+                href="/register"
+                className="text-red-600 hover:text-red-700 font-medium"
+              >
                 Registrarse
               </Link>
             </p>
@@ -157,5 +180,5 @@ export default function LoginPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

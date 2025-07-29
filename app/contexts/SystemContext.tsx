@@ -1,162 +1,174 @@
-"use client"
+"use client";
 
-import { createContext, useContext, type ReactNode, useEffect } from "react"
-import { useLocalStorage } from "../hooks/useLocalStorage"
+import { createContext, useContext, type ReactNode, useEffect } from "react";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 interface User {
-  id: string
-  nombres: string
-  apellidos: string
-  email: string
-  password: string
-  rol: "estudiante" | "tutor" | "coordinador" | "administrador"
-  facultad?: string
-  carrera?: string
-  especialidad?: string
-  preguntaSeguridad: string
-  respuestaSeguridad: string
-  fechaRegistro: string
+  id: string;
+  nombres: string;
+  apellidos: string;
+  email: string;
+  password: string;
+  rol: "estudiante" | "tutor" | "coordinador" | "administrador";
+  facultad?: string;
+  carrera?: string;
+  especialidad?: string;
+  preguntaSeguridad: string;
+  respuestaSeguridad: string;
+  fechaRegistro: string;
 }
 
 interface Tutoria {
-  id: string
-  estudianteEmail: string
-  tutorEmail: string
-  fecha: string
-  hora: string
-  asunto: string
-  descripcion: string
-  estado: "pendiente" | "aceptada" | "rechazada" | "completada"
-  observaciones?: string
-  calificacion?: string
-  fechaCreacion: string
-  fechaSolicitud: string
+  id: string;
+  estudianteEmail: string;
+  tutorEmail: string;
+  fecha: string;
+  hora: string;
+  asunto: string;
+  descripcion: string;
+  estado: "pendiente" | "aceptada" | "rechazada" | "completada";
+  observaciones?: string;
+  calificacion?: string;
+  fechaCreacion: string;
+  fechaSolicitud: string;
 }
 
 interface Tema {
-  id: string
-  estudianteEmail: string
-  titulo: string
-  descripcion: string
-  aprobado: boolean
-  observaciones?: string
-  comentarios?: string
-  fechaRegistro: string
-  fechaRevision?: string
+  id: string;
+  estudianteEmail: string;
+  titulo: string;
+  descripcion: string;
+  aprobado: boolean;
+  observaciones?: string;
+  comentarios?: string;
+  fechaRegistro: string;
+  fechaRevision?: string;
 }
 
 interface Archivo {
-  id: string
-  nombre: string
-  tipo: string
-  tamaño: number
-  contenido: string
-  url?: string
-  estudianteEmail: string
-  fechaSubida: string
+  id: string;
+  nombre: string;
+  tipo: string;
+  tamaño: number;
+  contenido: string;
+  url?: string;
+  estudianteEmail: string;
+  fechaSubida: string;
 }
 
 interface Asignacion {
-  id: string
-  estudianteId?: string
-  tutorId?: string
-  estudianteEmail?: string
-  tutorEmail?: string
-  coordinadorEmail?: string
-  fechaAsignacion: string
+  id: string;
+  estudianteId?: string;
+  tutorId?: string;
+  estudianteEmail?: string;
+  tutorEmail?: string;
+  coordinadorEmail?: string;
+  fechaAsignacion: string;
 }
 
 interface Notificacion {
-  id: string
-  usuarioEmail: string
-  tipo: string
-  mensaje: string
-  datos?: any
-  leida: boolean
-  fecha: string
+  id: string;
+  usuarioEmail: string;
+  tipo: string;
+  mensaje: string;
+  datos?: any;
+  leida: boolean;
+  fecha: string;
 }
 
 interface SystemContextType {
   // Usuarios
-  users: User[]
-  usuarios: User[]
-  saveUser: (user: User) => boolean
-  createUser: (user: User) => boolean
-  updateUser: (email: string, updates: Partial<User>) => boolean
-  deleteUser: (email: string) => boolean
-  getUserByEmail: (email: string) => User | undefined
-  getAllUsers: () => User[]
-  validateCredentials: (email: string, password: string) => boolean
-  validateEmailDomain: (email: string) => string | null
+  users: User[];
+  usuarios: User[];
+  saveUser: (user: User) => boolean;
+  createUser: (user: User) => boolean;
+  updateUser: (email: string, updates: Partial<User>) => boolean;
+  deleteUser: (email: string) => boolean;
+  getUserByEmail: (email: string) => User | undefined;
+  getAllUsers: () => User[];
+  validateCredentials: (email: string, password: string) => boolean;
+  validateEmailDomain: (email: string) => string | null;
 
   // Tutorías
-  tutorias: Tutoria[]
-  saveTutoria: (tutoria: Tutoria) => boolean
-  createTutoria: (tutoria: Omit<Tutoria, "id" | "fechaCreacion">) => boolean
-  updateTutoria: (id: string, updates: Partial<Tutoria>) => boolean
-  deleteTutoria: (id: string) => boolean
-  getTutoriasByStudent: (email: string) => Tutoria[]
-  getTutoriasByTutor: (email: string) => Tutoria[]
-  getAllTutorias: () => Tutoria[]
+  tutorias: Tutoria[];
+  saveTutoria: (tutoria: Tutoria) => boolean;
+  createTutoria: (tutoria: Omit<Tutoria, "id" | "fechaCreacion">) => boolean;
+  updateTutoria: (id: string, updates: Partial<Tutoria>) => boolean;
+  deleteTutoria: (id: string) => boolean;
+  getTutoriasByStudent: (email: string) => Tutoria[];
+  getTutoriasByTutor: (email: string) => Tutoria[];
+  getAllTutorias: () => Tutoria[];
 
   // Temas
-  temas: Tema[]
-  saveTema: (tema: Tema) => boolean
-  createTema: (tema: Omit<Tema, "id" | "fechaRegistro">) => boolean
-  updateTema: (id: string, updates: Partial<Tema>) => boolean
-  deleteTema: (id: string) => boolean
-  getTemaByStudent: (email: string) => Tema | undefined
-  getThemeByStudent: (email: string) => Tema | undefined
-  getAllTemas: () => Tema[]
+  temas: Tema[];
+  saveTema: (tema: Tema) => boolean;
+  createTema: (tema: Omit<Tema, "id" | "fechaRegistro">) => boolean;
+  updateTema: (id: string, updates: Partial<Tema>) => boolean;
+  deleteTema: (id: string) => boolean;
+  getTemaByStudent: (email: string) => Tema | undefined;
+  getThemeByStudent: (email: string) => Tema | undefined;
+  getAllTemas: () => Tema[];
 
   // Archivos
-  archivos: Archivo[]
-  saveArchivo: (archivo: Archivo) => boolean
-  createArchivo: (archivo: Omit<Archivo, "id" | "fechaSubida">) => boolean
-  deleteArchivo: (id: string) => boolean
-  getArchivosByStudent: (email: string) => Archivo[]
-  getFilesByStudent: (email: string) => Archivo[]
-  getAllArchivos: () => Archivo[]
+  archivos: Archivo[];
+  saveArchivo: (archivo: Archivo) => boolean;
+  createArchivo: (archivo: Omit<Archivo, "id" | "fechaSubida">) => boolean;
+  deleteArchivo: (id: string) => boolean;
+  getArchivosByStudent: (email: string) => Archivo[];
+  getFilesByStudent: (email: string) => Archivo[];
+  getAllArchivos: () => Archivo[];
 
   // Asignaciones
-  asignaciones: Asignacion[]
-  saveAsignacion: (asignacion: Asignacion) => boolean
-  deleteAsignacion: (id: string) => boolean
-  assignTutorToStudent: (studentId: string, tutorId: string) => boolean
-  removeAssignment: (studentId: string) => boolean
-  getAssignmentByStudent: (studentId: string) => Asignacion | undefined
-  getAssignmentsByTutor: (tutorId: string) => Asignacion[]
-  getAllAssignments: () => Asignacion[]
-  getAssignedTutor: (studentEmail: string) => User | undefined
-  getAssignedStudents: (tutorEmail: string) => User[]
+  asignaciones: Asignacion[];
+  saveAsignacion: (asignacion: Asignacion) => boolean;
+  deleteAsignacion: (id: string) => boolean;
+  assignTutorToStudent: (studentId: string, tutorId: string) => boolean;
+  removeAssignment: (studentId: string) => boolean;
+  getAssignmentByStudent: (studentId: string) => Asignacion | undefined;
+  getAssignmentsByTutor: (tutorId: string) => Asignacion[];
+  getAllAssignments: () => Asignacion[];
+  getAssignedTutor: (studentEmail: string) => User | undefined;
+  getAssignedStudents: (tutorEmail: string) => User[];
 
   // Notificaciones
-  notificaciones: Notificacion[]
-  createNotification: (userEmail: string, tipo: string, mensaje: string, datos?: any) => void
-  getNotifications: (userEmail: string) => Notificacion[]
-  markAsRead: (id: string) => void
-  markAllAsRead: (userEmail: string) => void
-  getAllNotifications: () => Notificacion[]
+  notificaciones: Notificacion[];
+  createNotification: (
+    userEmail: string,
+    tipo: string,
+    mensaje: string,
+    datos?: any,
+  ) => void;
+  getNotifications: (userEmail: string) => Notificacion[];
+  markAsRead: (id: string) => void;
+  markAllAsRead: (userEmail: string) => void;
+  getAllNotifications: () => Notificacion[];
 
   // Utilidades
-  generateId: () => string
-  formatDate: (date: string) => string
-  resetSystem: () => void
-  getSystemStats: () => any
-  forceCreateDefaultUsers: () => void
+  generateId: () => string;
+  formatDate: (date: string) => string;
+  resetSystem: () => void;
+  getSystemStats: () => any;
+  forceCreateDefaultUsers: () => void;
 }
 
-const SystemContext = createContext<SystemContextType | undefined>(undefined)
+const SystemContext = createContext<SystemContextType | undefined>(undefined);
 
 export function SystemProvider({ children }: { children: ReactNode }) {
-  const [usuarios, setUsuarios] = useLocalStorage<User[]>("usuarios", [])
-  const [tutorias, setTutorias] = useLocalStorage<Tutoria[]>("tutorias", [])
-  const [temas, setTemas] = useLocalStorage<Tema[]>("temas", [])
-  const [archivos, setArchivos] = useLocalStorage<Archivo[]>("archivos", [])
-  const [asignaciones, setAsignaciones] = useLocalStorage<Asignacion[]>("asignaciones", [])
-  const [notificaciones, setNotificaciones] = useLocalStorage<Notificacion[]>("notificaciones", [])
+  const [usuarios, setUsuarios] = useLocalStorage<User[]>("usuarios", []);
+  const [tutorias, setTutorias] = useLocalStorage<Tutoria[]>("tutorias", []);
+  const [temas, setTemas] = useLocalStorage<Tema[]>("temas", []);
+  const [archivos, setArchivos] = useLocalStorage<Archivo[]>("archivos", []);
+  const [asignaciones, setAsignaciones] = useLocalStorage<Asignacion[]>(
+    "asignaciones",
+    [],
+  );
+  const [notificaciones, setNotificaciones] = useLocalStorage<Notificacion[]>(
+    "notificaciones",
+    [],
+  );
 
-  const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2)
+  const generateId = () =>
+    Date.now().toString(36) + Math.random().toString(36).substr(2);
 
   const validateEmailDomain = (email: string): string | null => {
     const domains = {
@@ -164,185 +176,233 @@ export function SystemProvider({ children }: { children: ReactNode }) {
       tutor: "@uleam.edu.ec",
       coordinador: "@coordtit.uleam.edu.ec",
       administrador: "@admin.uleam.edu.ec",
-    }
+    };
 
     for (const [rol, dominio] of Object.entries(domains)) {
       if (email.endsWith(dominio)) {
-        return rol
+        return rol;
       }
     }
-    return null
-  }
+    return null;
+  };
 
   const saveUser = (user: User): boolean => {
-    const existingIndex = usuarios.findIndex((u) => u.email === user.email)
+    const existingIndex = usuarios.findIndex((u) => u.email === user.email);
     if (existingIndex >= 0) {
-      setUsuarios((prev) => prev.map((u, index) => (index === existingIndex ? user : u)))
+      setUsuarios((prev) =>
+        prev.map((u, index) => (index === existingIndex ? user : u)),
+      );
     } else {
-      setUsuarios((prev) => [...prev, user])
+      setUsuarios((prev) => [...prev, user]);
     }
-    return true
-  }
+    return true;
+  };
 
   const createUser = (user: User): boolean => {
     if (usuarios.find((u) => u.email === user.email)) {
-      return false // User already exists
+      return false; // User already exists
     }
-    setUsuarios((prev) => [...prev, user])
-    return true
-  }
+    setUsuarios((prev) => [...prev, user]);
+    return true;
+  };
 
   const updateUser = (email: string, updates: Partial<User>): boolean => {
-    setUsuarios((prev) => prev.map((user) => (user.email === email ? { ...user, ...updates } : user)))
-    return true
-  }
+    setUsuarios((prev) =>
+      prev.map((user) =>
+        user.email === email ? { ...user, ...updates } : user,
+      ),
+    );
+    return true;
+  };
 
   const deleteUser = (email: string): boolean => {
-    setUsuarios((prev) => prev.filter((user) => user.email !== email))
+    setUsuarios((prev) => prev.filter((user) => user.email !== email));
     // Also remove related data
-    setTutorias((prev) => prev.filter((t) => t.estudianteEmail !== email && t.tutorEmail !== email))
-    setTemas((prev) => prev.filter((t) => t.estudianteEmail !== email))
-    setArchivos((prev) => prev.filter((a) => a.estudianteEmail !== email))
-    const userToDelete = usuarios.find((u) => u.email === email)
+    setTutorias((prev) =>
+      prev.filter((t) => t.estudianteEmail !== email && t.tutorEmail !== email),
+    );
+    setTemas((prev) => prev.filter((t) => t.estudianteEmail !== email));
+    setArchivos((prev) => prev.filter((a) => a.estudianteEmail !== email));
+    const userToDelete = usuarios.find((u) => u.email === email);
     if (userToDelete) {
-      setAsignaciones((prev) => prev.filter((a) => a.estudianteId !== userToDelete.id && a.tutorId !== userToDelete.id))
+      setAsignaciones((prev) =>
+        prev.filter(
+          (a) =>
+            a.estudianteId !== userToDelete.id && a.tutorId !== userToDelete.id,
+        ),
+      );
     }
-    return true
-  }
+    return true;
+  };
 
-  const getUserByEmail = (email: string) => usuarios.find((u) => u.email === email)
+  const getUserByEmail = (email: string) =>
+    usuarios.find((u) => u.email === email);
 
-  const getAllUsers = () => usuarios
+  const getAllUsers = () => usuarios;
 
   const validateCredentials = (email: string, password: string): boolean => {
-    const user = getUserByEmail(email)
-    return user ? user.password === password : false
-  }
+    const user = getUserByEmail(email);
+    return user ? user.password === password : false;
+  };
 
   const saveTutoria = (tutoria: Tutoria): boolean => {
-    const existingIndex = tutorias.findIndex((t) => t.id === tutoria.id)
+    const existingIndex = tutorias.findIndex((t) => t.id === tutoria.id);
     if (existingIndex >= 0) {
-      setTutorias((prev) => prev.map((t, index) => (index === existingIndex ? tutoria : t)))
+      setTutorias((prev) =>
+        prev.map((t, index) => (index === existingIndex ? tutoria : t)),
+      );
     } else {
-      setTutorias((prev) => [...prev, tutoria])
+      setTutorias((prev) => [...prev, tutoria]);
     }
-    return true
-  }
+    return true;
+  };
 
-  const createTutoria = (tutoria: Omit<Tutoria, "id" | "fechaCreacion">): boolean => {
+  const createTutoria = (
+    tutoria: Omit<Tutoria, "id" | "fechaCreacion">,
+  ): boolean => {
     const newTutoria: Tutoria = {
       ...tutoria,
       id: generateId(),
       fechaCreacion: new Date().toISOString(),
-    }
-    setTutorias((prev) => [...prev, newTutoria])
-    createNotification(tutoria.tutorEmail, "NUEVA_SOLICITUD", `Nueva solicitud de tutoría: ${tutoria.asunto}`)
-    return true
-  }
+    };
+    setTutorias((prev) => [...prev, newTutoria]);
+    createNotification(
+      tutoria.tutorEmail,
+      "NUEVA_SOLICITUD",
+      `Nueva solicitud de tutoría: ${tutoria.asunto}`,
+    );
+    return true;
+  };
 
   const updateTutoria = (id: string, updates: Partial<Tutoria>): boolean => {
-    setTutorias((prev) => prev.map((tutoria) => (tutoria.id === id ? { ...tutoria, ...updates } : tutoria)))
-    return true
-  }
+    setTutorias((prev) =>
+      prev.map((tutoria) =>
+        tutoria.id === id ? { ...tutoria, ...updates } : tutoria,
+      ),
+    );
+    return true;
+  };
 
   const deleteTutoria = (id: string): boolean => {
-    setTutorias((prev) => prev.filter((tutoria) => tutoria.id !== id))
-    return true
-  }
+    setTutorias((prev) => prev.filter((tutoria) => tutoria.id !== id));
+    return true;
+  };
 
-  const getTutoriasByStudent = (email: string) => tutorias.filter((t) => t.estudianteEmail === email)
+  const getTutoriasByStudent = (email: string) =>
+    tutorias.filter((t) => t.estudianteEmail === email);
 
-  const getTutoriasByTutor = (email: string) => tutorias.filter((t) => t.tutorEmail === email)
+  const getTutoriasByTutor = (email: string) =>
+    tutorias.filter((t) => t.tutorEmail === email);
 
-  const getAllTutorias = () => tutorias
+  const getAllTutorias = () => tutorias;
 
   const saveTema = (tema: Tema): boolean => {
-    const existingIndex = temas.findIndex((t) => t.id === tema.id)
+    const existingIndex = temas.findIndex((t) => t.id === tema.id);
     if (existingIndex >= 0) {
-      setTemas((prev) => prev.map((t, index) => (index === existingIndex ? tema : t)))
+      setTemas((prev) =>
+        prev.map((t, index) => (index === existingIndex ? tema : t)),
+      );
     } else {
-      setTemas((prev) => [...prev, tema])
+      setTemas((prev) => [...prev, tema]);
     }
-    return true
-  }
+    return true;
+  };
 
   const createTema = (tema: Omit<Tema, "id" | "fechaRegistro">): boolean => {
     const newTema: Tema = {
       ...tema,
       id: generateId(),
       fechaRegistro: new Date().toISOString(),
-    }
-    setTemas((prev) => [...prev, newTema])
-    return true
-  }
+    };
+    setTemas((prev) => [...prev, newTema]);
+    return true;
+  };
 
   const updateTema = (id: string, updates: Partial<Tema>): boolean => {
-    setTemas((prev) => prev.map((tema) => (tema.id === id ? { ...tema, ...updates } : tema)))
-    return true
-  }
+    setTemas((prev) =>
+      prev.map((tema) => (tema.id === id ? { ...tema, ...updates } : tema)),
+    );
+    return true;
+  };
 
   const deleteTema = (id: string): boolean => {
-    setTemas((prev) => prev.filter((tema) => tema.id !== id))
-    return true
-  }
+    setTemas((prev) => prev.filter((tema) => tema.id !== id));
+    return true;
+  };
 
-  const getTemaByStudent = (email: string) => temas.find((t) => t.estudianteEmail === email)
+  const getTemaByStudent = (email: string) =>
+    temas.find((t) => t.estudianteEmail === email);
 
-  const getAllTemas = () => temas
+  const getAllTemas = () => temas;
 
   const saveArchivo = (archivo: Archivo): boolean => {
-    const existingIndex = archivos.findIndex((a) => a.id === archivo.id)
+    const existingIndex = archivos.findIndex((a) => a.id === archivo.id);
     if (existingIndex >= 0) {
-      setArchivos((prev) => prev.map((a, index) => (index === existingIndex ? archivo : a)))
+      setArchivos((prev) =>
+        prev.map((a, index) => (index === existingIndex ? archivo : a)),
+      );
     } else {
-      setArchivos((prev) => [...prev, archivo])
+      setArchivos((prev) => [...prev, archivo]);
     }
-    return true
-  }
+    return true;
+  };
 
-  const createArchivo = (archivo: Omit<Archivo, "id" | "fechaSubida">): boolean => {
+  const createArchivo = (
+    archivo: Omit<Archivo, "id" | "fechaSubida">,
+  ): boolean => {
     const newArchivo: Archivo = {
       ...archivo,
       id: generateId(),
       fechaSubida: new Date().toISOString(),
-    }
-    setArchivos((prev) => [...prev, newArchivo])
-    const tutor = getAssignedTutor(archivo.estudianteEmail)
+    };
+    setArchivos((prev) => [...prev, newArchivo]);
+    const tutor = getAssignedTutor(archivo.estudianteEmail);
     if (tutor) {
-      createNotification(tutor.email, "ARCHIVO_SUBIDO", `El estudiante ha subido un nuevo archivo: ${archivo.nombre}`)
+      createNotification(
+        tutor.email,
+        "ARCHIVO_SUBIDO",
+        `El estudiante ha subido un nuevo archivo: ${archivo.nombre}`,
+      );
     }
-    return true
-  }
+    return true;
+  };
 
   const deleteArchivo = (id: string): boolean => {
-    setArchivos((prev) => prev.filter((a) => a.id !== id))
-    return true
-  }
+    setArchivos((prev) => prev.filter((a) => a.id !== id));
+    return true;
+  };
 
-  const getArchivosByStudent = (email: string) => archivos.filter((a) => a.estudianteEmail === email)
+  const getArchivosByStudent = (email: string) =>
+    archivos.filter((a) => a.estudianteEmail === email);
 
-  const getFilesByStudent = (email: string) => archivos.filter((a) => a.estudianteEmail === email)
+  const getFilesByStudent = (email: string) =>
+    archivos.filter((a) => a.estudianteEmail === email);
 
-  const getAllArchivos = () => archivos
+  const getAllArchivos = () => archivos;
 
   const saveAsignacion = (asignacion: Asignacion): boolean => {
-    const existingIndex = asignaciones.findIndex((a) => a.id === asignacion.id)
+    const existingIndex = asignaciones.findIndex((a) => a.id === asignacion.id);
     if (existingIndex >= 0) {
-      setAsignaciones((prev) => prev.map((a, index) => (index === existingIndex ? asignacion : a)))
+      setAsignaciones((prev) =>
+        prev.map((a, index) => (index === existingIndex ? asignacion : a)),
+      );
     } else {
-      setAsignaciones((prev) => [...prev, asignacion])
+      setAsignaciones((prev) => [...prev, asignacion]);
     }
-    return true
-  }
+    return true;
+  };
 
   const deleteAsignacion = (id: string): boolean => {
-    setAsignaciones((prev) => prev.filter((a) => a.id !== id))
-    return true
-  }
+    setAsignaciones((prev) => prev.filter((a) => a.id !== id));
+    return true;
+  };
 
-  const assignTutorToStudent = (studentId: string, tutorId: string): boolean => {
+  const assignTutorToStudent = (
+    studentId: string,
+    tutorId: string,
+  ): boolean => {
     // Remove existing assignment if any
-    setAsignaciones((prev) => prev.filter((a) => a.estudianteId !== studentId))
+    setAsignaciones((prev) => prev.filter((a) => a.estudianteId !== studentId));
 
     // Add new assignment
     const newAssignment: Asignacion = {
@@ -350,48 +410,59 @@ export function SystemProvider({ children }: { children: ReactNode }) {
       estudianteId: studentId,
       tutorId: tutorId,
       fechaAsignacion: new Date().toISOString(),
-    }
-    setAsignaciones((prev) => [...prev, newAssignment])
-    return true
-  }
+    };
+    setAsignaciones((prev) => [...prev, newAssignment]);
+    return true;
+  };
 
   const removeAssignment = (studentId: string): boolean => {
-    setAsignaciones((prev) => prev.filter((a) => a.estudianteId !== studentId))
-    return true
-  }
+    setAsignaciones((prev) => prev.filter((a) => a.estudianteId !== studentId));
+    return true;
+  };
 
-  const getAssignmentByStudent = (studentId: string): Asignacion | undefined => {
-    return asignaciones.find((a) => a.estudianteId === studentId)
-  }
+  const getAssignmentByStudent = (
+    studentId: string,
+  ): Asignacion | undefined => {
+    return asignaciones.find((a) => a.estudianteId === studentId);
+  };
 
   const getAssignmentsByTutor = (tutorId: string): Asignacion[] => {
-    return asignaciones.filter((a) => a.tutorId === tutorId)
-  }
+    return asignaciones.filter((a) => a.tutorId === tutorId);
+  };
 
-  const getAllAssignments = () => asignaciones
+  const getAllAssignments = () => asignaciones;
 
   const getAssignedTutor = (studentEmail: string): User | undefined => {
     // First find the student by email to get their ID
-    const student = usuarios.find((u) => u.email === studentEmail)
-    if (!student) return undefined
+    const student = usuarios.find((u) => u.email === studentEmail);
+    if (!student) return undefined;
 
     // Then find the assignment using the student ID
-    const asignacion = asignaciones.find((a) => a.estudianteId === student.id)
-    if (!asignacion) return undefined
+    const asignacion = asignaciones.find((a) => a.estudianteId === student.id);
+    if (!asignacion) return undefined;
 
     // Finally find the tutor by ID
-    return usuarios.find((u) => u.id === asignacion.tutorId)
-  }
+    return usuarios.find((u) => u.id === asignacion.tutorId);
+  };
 
   const getAssignedStudents = (tutorEmail: string): User[] => {
-    const tutor = usuarios.find((u) => u.email === tutorEmail)
-    if (!tutor) return []
+    const tutor = usuarios.find((u) => u.email === tutorEmail);
+    if (!tutor) return [];
 
-    const tutorAsignaciones = asignaciones.filter((a) => a.tutorId === tutor.id)
-    return tutorAsignaciones.map((a) => usuarios.find((u) => u.id === a.estudianteId)).filter(Boolean) as User[]
-  }
+    const tutorAsignaciones = asignaciones.filter(
+      (a) => a.tutorId === tutor.id,
+    );
+    return tutorAsignaciones
+      .map((a) => usuarios.find((u) => u.id === a.estudianteId))
+      .filter(Boolean) as User[];
+  };
 
-  const createNotification = (userEmail: string, tipo: string, mensaje: string, datos?: any) => {
+  const createNotification = (
+    userEmail: string,
+    tipo: string,
+    mensaje: string,
+    datos?: any,
+  ) => {
     const notification: Notificacion = {
       id: generateId(),
       usuarioEmail: userEmail,
@@ -400,38 +471,45 @@ export function SystemProvider({ children }: { children: ReactNode }) {
       datos,
       leida: false,
       fecha: new Date().toISOString(),
-    }
-    setNotificaciones((prev) => [...prev, notification])
-  }
+    };
+    setNotificaciones((prev) => [...prev, notification]);
+  };
 
-  const getNotifications = (userEmail: string) => notificaciones.filter((n) => n.usuarioEmail === userEmail)
+  const getNotifications = (userEmail: string) =>
+    notificaciones.filter((n) => n.usuarioEmail === userEmail);
 
-  const getAllNotifications = () => notificaciones
+  const getAllNotifications = () => notificaciones;
 
   const markAsRead = (id: string) => {
-    setNotificaciones((prev) => prev.map((n) => (n.id === id ? { ...n, leida: true } : n)))
-  }
+    setNotificaciones((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, leida: true } : n)),
+    );
+  };
 
   const markAllAsRead = (userEmail: string) => {
-    setNotificaciones((prev) => prev.map((n) => (n.usuarioEmail === userEmail ? { ...n, leida: true } : n)))
-  }
+    setNotificaciones((prev) =>
+      prev.map((n) =>
+        n.usuarioEmail === userEmail ? { ...n, leida: true } : n,
+      ),
+    );
+  };
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString("es-ES", {
       year: "numeric",
       month: "long",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   const resetSystem = () => {
-    setUsuarios([])
-    setTutorias([])
-    setTemas([])
-    setArchivos([])
-    setAsignaciones([])
-    setNotificaciones([])
-  }
+    setUsuarios([]);
+    setTutorias([]);
+    setTemas([]);
+    setArchivos([]);
+    setAsignaciones([]);
+    setNotificaciones([]);
+  };
 
   const getSystemStats = () => {
     return {
@@ -440,20 +518,21 @@ export function SystemProvider({ children }: { children: ReactNode }) {
       totalTutors: usuarios.filter((u) => u.rol === "tutor").length,
       totalCoordinators: usuarios.filter((u) => u.rol === "coordinador").length,
       totalTutorias: tutorias.length,
-      completedTutorias: tutorias.filter((t) => t.estado === "completada").length,
+      completedTutorias: tutorias.filter((t) => t.estado === "completada")
+        .length,
       totalThemes: temas.length,
       totalFiles: archivos.length,
       facultiesActivity: usuarios.reduce(
         (acc, user) => {
           if (user.facultad) {
-            acc[user.facultad] = (acc[user.facultad] || 0) + 1
+            acc[user.facultad] = (acc[user.facultad] || 0) + 1;
           }
-          return acc
+          return acc;
         },
         {} as Record<string, number>,
       ),
-    }
-  }
+    };
+  };
 
   // Crear datos de ejemplo si no existen
   useEffect(() => {
@@ -506,7 +585,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           email: "carlos.mendoza@live.uleam.edu.ec",
           password: "estudiante123",
           rol: "estudiante" as const,
-          facultad: "Facultad de Ciencias Administrativas, Contables y Comerciales",
+          facultad:
+            "Facultad de Ciencias Administrativas, Contables y Comerciales",
           carrera: "Administración de Empresas",
           preguntaSeguridad: "mascota",
           respuestaSeguridad: "max",
@@ -559,7 +639,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           email: "laura.morales@uleam.edu.ec",
           password: "tutor123",
           rol: "tutor" as const,
-          facultad: "Facultad de Ciencias Administrativas, Contables y Comerciales",
+          facultad:
+            "Facultad de Ciencias Administrativas, Contables y Comerciales",
           especialidad: "Gestión Empresarial",
           preguntaSeguridad: "ciudad",
           respuestaSeguridad: "chone",
@@ -597,7 +678,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           email: "sandra.ramirez@coordtit.uleam.edu.ec",
           password: "coordinador123",
           rol: "coordinador" as const,
-          facultad: "Facultad de Ciencias Administrativas, Contables y Comerciales",
+          facultad:
+            "Facultad de Ciencias Administrativas, Contables y Comerciales",
           preguntaSeguridad: "ciudad",
           respuestaSeguridad: "bahia",
           fechaRegistro: new Date().toISOString(),
@@ -610,7 +692,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           email: "admin@admin.uleam.edu.ec",
           password: "admin123",
           rol: "administrador" as const,
-          facultad: "Facultad de Ciencias Administrativas, Contables y Comerciales",
+          facultad:
+            "Facultad de Ciencias Administrativas, Contables y Comerciales",
           preguntaSeguridad: "mascota",
           respuestaSeguridad: "admin",
           fechaRegistro: new Date().toISOString(),
@@ -627,9 +710,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           respuestaSeguridad: "uleam",
           fechaRegistro: new Date().toISOString(),
         },
-      ]
+      ];
 
-      setUsuarios(defaultUsers)
+      setUsuarios(defaultUsers);
 
       // Crear temas de ejemplo
       const defaultTemas = [
@@ -660,9 +743,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           fechaRegistro: new Date().toISOString(),
           aprobado: true,
         },
-      ]
+      ];
 
-      setTemas(defaultTemas)
+      setTemas(defaultTemas);
 
       // Crear asignaciones de ejemplo
       const defaultAsignaciones = [
@@ -684,9 +767,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           tutorId: "tutor3",
           fechaAsignacion: new Date().toISOString(),
         },
-      ]
+      ];
 
-      setAsignaciones(defaultAsignaciones)
+      setAsignaciones(defaultAsignaciones);
 
       // Crear tutorías de ejemplo
       const defaultTutorias = [
@@ -697,7 +780,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           fecha: "2024-02-15",
           hora: "10:00",
           asunto: "Revisión del Marco Teórico",
-          descripcion: "Revisión y corrección del marco teórico del proyecto de titulación",
+          descripcion:
+            "Revisión y corrección del marco teórico del proyecto de titulación",
           estado: "completada" as const,
           fechaCreacion: new Date().toISOString(),
           fechaSolicitud: new Date().toISOString(),
@@ -723,7 +807,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           fecha: "2024-02-18",
           hora: "09:00",
           asunto: "Metodología de Investigación",
-          descripcion: "Definición de la metodología para el análisis estructural",
+          descripcion:
+            "Definición de la metodología para el análisis estructural",
           estado: "pendiente" as const,
           fechaCreacion: new Date().toISOString(),
           fechaSolicitud: new Date().toISOString(),
@@ -742,9 +827,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           observaciones: "Muy buen planteamiento metodológico",
           calificacion: "Muy Bueno",
         },
-      ]
+      ];
 
-      setTutorias(defaultTutorias)
+      setTutorias(defaultTutorias);
 
       // Crear archivos de ejemplo
       const defaultArchivos = [
@@ -778,9 +863,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           estudianteEmail: "ana.lopez@live.uleam.edu.ec",
           fechaSubida: new Date().toISOString(),
         },
-      ]
+      ];
 
-      setArchivos(defaultArchivos)
+      setArchivos(defaultArchivos);
 
       // Crear notificaciones de ejemplo
       const defaultNotificaciones = [
@@ -816,20 +901,20 @@ export function SystemProvider({ children }: { children: ReactNode }) {
           leida: true,
           fecha: new Date().toISOString(),
         },
-      ]
+      ];
 
-      setNotificaciones(defaultNotificaciones)
+      setNotificaciones(defaultNotificaciones);
     }
-  }, [usuarios.length])
+  }, [usuarios.length]);
 
   const forceCreateDefaultUsers = () => {
     // Limpiar todos los datos primero
-    setUsuarios([])
-    setTutorias([])
-    setTemas([])
-    setArchivos([])
-    setAsignaciones([])
-    setNotificaciones([])
+    setUsuarios([]);
+    setTutorias([]);
+    setTemas([]);
+    setArchivos([]);
+    setAsignaciones([]);
+    setNotificaciones([]);
 
     // Recrear todos los datos de ejemplo
     const defaultUsers = [
@@ -880,7 +965,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         email: "carlos.mendoza@live.uleam.edu.ec",
         password: "estudiante123",
         rol: "estudiante" as const,
-        facultad: "Facultad de Ciencias Administrativas, Contables y Comerciales",
+        facultad:
+          "Facultad de Ciencias Administrativas, Contables y Comerciales",
         carrera: "Administración de Empresas",
         preguntaSeguridad: "mascota",
         respuestaSeguridad: "max",
@@ -933,7 +1019,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         email: "laura.morales@uleam.edu.ec",
         password: "tutor123",
         rol: "tutor" as const,
-        facultad: "Facultad de Ciencias Administrativas, Contables y Comerciales",
+        facultad:
+          "Facultad de Ciencias Administrativas, Contables y Comerciales",
         especialidad: "Gestión Empresarial",
         preguntaSeguridad: "ciudad",
         respuestaSeguridad: "chone",
@@ -971,7 +1058,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         email: "sandra.ramirez@coordtit.uleam.edu.ec",
         password: "coordinador123",
         rol: "coordinador" as const,
-        facultad: "Facultad de Ciencias Administrativas, Contables y Comerciales",
+        facultad:
+          "Facultad de Ciencias Administrativas, Contables y Comerciales",
         preguntaSeguridad: "ciudad",
         respuestaSeguridad: "bahia",
         fechaRegistro: new Date().toISOString(),
@@ -984,7 +1072,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         email: "admin@admin.uleam.edu.ec",
         password: "admin123",
         rol: "administrador" as const,
-        facultad: "Facultad de Ciencias Administrativas, Contables y Comerciales",
+        facultad:
+          "Facultad de Ciencias Administrativas, Contables y Comerciales",
         preguntaSeguridad: "mascota",
         respuestaSeguridad: "admin",
         fechaRegistro: new Date().toISOString(),
@@ -1001,9 +1090,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         respuestaSeguridad: "uleam",
         fechaRegistro: new Date().toISOString(),
       },
-    ]
+    ];
 
-    setUsuarios(defaultUsers)
+    setUsuarios(defaultUsers);
 
     // Crear temas de ejemplo
     const defaultTemas = [
@@ -1034,9 +1123,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         fechaRegistro: new Date().toISOString(),
         aprobado: true,
       },
-    ]
+    ];
 
-    setTemas(defaultTemas)
+    setTemas(defaultTemas);
 
     // Crear asignaciones de ejemplo
     const defaultAsignaciones = [
@@ -1058,9 +1147,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         tutorId: "tutor3",
         fechaAsignacion: new Date().toISOString(),
       },
-    ]
+    ];
 
-    setAsignaciones(defaultAsignaciones)
+    setAsignaciones(defaultAsignaciones);
 
     // Crear tutorías de ejemplo
     const defaultTutorias = [
@@ -1071,7 +1160,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         fecha: "2024-02-15",
         hora: "10:00",
         asunto: "Revisión del Marco Teórico",
-        descripcion: "Revisión y corrección del marco teórico del proyecto de titulación",
+        descripcion:
+          "Revisión y corrección del marco teórico del proyecto de titulación",
         estado: "completada" as const,
         fechaCreacion: new Date().toISOString(),
         fechaSolicitud: new Date().toISOString(),
@@ -1097,7 +1187,8 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         fecha: "2024-02-18",
         hora: "09:00",
         asunto: "Metodología de Investigación",
-        descripcion: "Definición de la metodología para el análisis estructural",
+        descripcion:
+          "Definición de la metodología para el análisis estructural",
         estado: "pendiente" as const,
         fechaCreacion: new Date().toISOString(),
         fechaSolicitud: new Date().toISOString(),
@@ -1116,9 +1207,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         observaciones: "Muy buen planteamiento metodológico",
         calificacion: "Muy Bueno",
       },
-    ]
+    ];
 
-    setTutorias(defaultTutorias)
+    setTutorias(defaultTutorias);
 
     // Crear archivos de ejemplo
     const defaultArchivos = [
@@ -1152,9 +1243,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         estudianteEmail: "ana.lopez@live.uleam.edu.ec",
         fechaSubida: new Date().toISOString(),
       },
-    ]
+    ];
 
-    setArchivos(defaultArchivos)
+    setArchivos(defaultArchivos);
 
     // Crear notificaciones de ejemplo
     const defaultNotificaciones = [
@@ -1190,10 +1281,10 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         leida: true,
         fecha: new Date().toISOString(),
       },
-    ]
+    ];
 
-    setNotificaciones(defaultNotificaciones)
-  }
+    setNotificaciones(defaultNotificaciones);
+  };
 
   return (
     <SystemContext.Provider
@@ -1256,13 +1347,13 @@ export function SystemProvider({ children }: { children: ReactNode }) {
     >
       {children}
     </SystemContext.Provider>
-  )
+  );
 }
 
 export function useSystem() {
-  const context = useContext(SystemContext)
+  const context = useContext(SystemContext);
   if (context === undefined) {
-    throw new Error("useSystem must be used within a SystemProvider")
+    throw new Error("useSystem must be used within a SystemProvider");
   }
-  return context
+  return context;
 }

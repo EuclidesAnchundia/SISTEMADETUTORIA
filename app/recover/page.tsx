@@ -1,81 +1,85 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useSystem } from "../contexts/SystemContext"
-import { KeyRound, GraduationCap } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { useSystem } from "../contexts/SystemContext";
+import { KeyRound, GraduationCap } from "lucide-react";
 
 export default function RecoverPage() {
-  const [step, setStep] = useState(1)
-  const [email, setEmail] = useState("")
-  const [securityAnswer, setSecurityAnswer] = useState("")
-  const [newPassword, setNewPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [user, setUser] = useState<any>(null)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
+  const [step, setStep] = useState(1);
+  const [email, setEmail] = useState("");
+  const [securityAnswer, setSecurityAnswer] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [user, setUser] = useState<any>(null);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const { getUserByEmail, updateUser } = useSystem()
+  const { getUserByEmail, updateUser } = useSystem();
 
   const handleEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
-    const foundUser = getUserByEmail(email)
+    const foundUser = getUserByEmail(email);
     if (!foundUser) {
-      setError("No se encontró un usuario con este correo electrónico.")
-      return
+      setError("No se encontró un usuario con este correo electrónico.");
+      return;
     }
 
-    setUser(foundUser)
-    setStep(2)
-  }
+    setUser(foundUser);
+    setStep(2);
+  };
 
   const handleSecuritySubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
-    if (user.respuestaSeguridad.toLowerCase() !== securityAnswer.toLowerCase()) {
-      setError("La respuesta de seguridad es incorrecta.")
-      return
+    if (
+      user.respuestaSeguridad.toLowerCase() !== securityAnswer.toLowerCase()
+    ) {
+      setError("La respuesta de seguridad es incorrecta.");
+      return;
     }
 
-    setStep(3)
-  }
+    setStep(3);
+  };
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     if (newPassword !== confirmPassword) {
-      setError("Las contraseñas no coinciden.")
-      return
+      setError("Las contraseñas no coinciden.");
+      return;
     }
 
     if (newPassword.length < 8) {
-      setError("La contraseña debe tener al menos 8 caracteres.")
-      return
+      setError("La contraseña debe tener al menos 8 caracteres.");
+      return;
     }
 
-    const updated = updateUser(user.email, { password: newPassword })
+    const updated = updateUser(user.email, { password: newPassword });
     if (updated) {
-      setSuccess("Contraseña actualizada exitosamente. Ahora puedes iniciar sesión.")
-      setStep(4)
+      setSuccess(
+        "Contraseña actualizada exitosamente. Ahora puedes iniciar sesión.",
+      );
+      setStep(4);
     } else {
-      setError("Error al actualizar la contraseña.")
+      setError("Error al actualizar la contraseña.");
     }
-  }
+  };
 
   const getSecurityQuestion = (pregunta: string) => {
     const questions = {
       mascota: "¿Cuál es el nombre de tu primera mascota?",
       ciudad: "¿En qué ciudad naciste?",
       escuela: "¿Cuál es el nombre de tu escuela primaria?",
-    }
-    return questions[pregunta as keyof typeof questions] || pregunta
-  }
+    };
+    return questions[pregunta as keyof typeof questions] || pregunta;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -96,20 +100,32 @@ export default function RecoverPage() {
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
             <KeyRound className="mx-auto mb-4 text-red-600" size={48} />
-            <h2 className="text-2xl font-bold text-gray-900">Recuperar Contraseña</h2>
-            <p className="text-gray-600">Sigue los pasos para restablecer tu contraseña</p>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Recuperar Contraseña
+            </h2>
+            <p className="text-gray-600">
+              Sigue los pasos para restablecer tu contraseña
+            </p>
           </div>
 
-          {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
 
           {success && (
-            <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">{success}</div>
+            <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+              {success}
+            </div>
           )}
 
           {step === 1 && (
             <form onSubmit={handleEmailSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Correo Institucional</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Correo Institucional
+                </label>
                 <input
                   type="email"
                   value={email}
@@ -130,8 +146,12 @@ export default function RecoverPage() {
           {step === 2 && user && (
             <form onSubmit={handleSecuritySubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Pregunta de Seguridad</label>
-                <p className="text-gray-900 mb-4">{getSecurityQuestion(user.preguntaSeguridad)}</p>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Pregunta de Seguridad
+                </label>
+                <p className="text-gray-900 mb-4">
+                  {getSecurityQuestion(user.preguntaSeguridad)}
+                </p>
                 <input
                   type="text"
                   value={securityAnswer}
@@ -153,7 +173,9 @@ export default function RecoverPage() {
           {step === 3 && (
             <form onSubmit={handlePasswordSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nueva Contraseña
+                </label>
                 <input
                   type="password"
                   value={newPassword}
@@ -163,7 +185,9 @@ export default function RecoverPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Contraseña</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirmar Contraseña
+                </label>
                 <input
                   type="password"
                   value={confirmPassword}
@@ -193,12 +217,15 @@ export default function RecoverPage() {
           )}
 
           <div className="mt-6 text-center">
-            <Link href="/login" className="text-red-600 hover:text-red-700 text-sm">
+            <Link
+              href="/login"
+              className="text-red-600 hover:text-red-700 text-sm"
+            >
               Volver al inicio de sesión
             </Link>
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }

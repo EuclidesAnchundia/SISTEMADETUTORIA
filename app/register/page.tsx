@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useSystem } from "../contexts/SystemContext"
-import { UserPlus, GraduationCap } from "lucide-react"
-import { useToast } from "../components/ui/toast"
+import type React from "react";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSystem } from "../contexts/SystemContext";
+import { UserPlus, GraduationCap } from "lucide-react";
+import { useToast } from "../components/ui/toast";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -20,18 +20,19 @@ export default function RegisterPage() {
     especialidad: "",
     preguntaSeguridad: "mascota",
     respuestaSeguridad: "",
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const { saveUser, validateEmailDomain, getUserByEmail, generateId } = useSystem()
-  const router = useRouter()
-  const { addToast } = useToast()
+  const { saveUser, validateEmailDomain, getUserByEmail, generateId } =
+    useSystem();
+  const router = useRouter();
+  const { addToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     // Validaciones con toasts
     if (formData.password !== formData.confirmPassword) {
@@ -39,9 +40,9 @@ export default function RegisterPage() {
         type: "error",
         title: "Error de contraseña",
         description: "Las contraseñas no coinciden.",
-      })
-      setLoading(false)
-      return
+      });
+      setLoading(false);
+      return;
     }
 
     if (formData.password.length < 8) {
@@ -49,20 +50,20 @@ export default function RegisterPage() {
         type: "warning",
         title: "Contraseña débil",
         description: "La contraseña debe tener al menos 8 caracteres.",
-      })
-      setLoading(false)
-      return
+      });
+      setLoading(false);
+      return;
     }
 
-    const rol = validateEmailDomain(formData.email)
+    const rol = validateEmailDomain(formData.email);
     if (!rol) {
       addToast({
         type: "error",
         title: "Correo inválido",
         description: "Debes usar un correo institucional válido de la ULEAM.",
-      })
-      setLoading(false)
-      return
+      });
+      setLoading(false);
+      return;
     }
 
     if (getUserByEmail(formData.email)) {
@@ -70,9 +71,9 @@ export default function RegisterPage() {
         type: "error",
         title: "Usuario existente",
         description: "Ya existe un usuario con este correo electrónico.",
-      })
-      setLoading(false)
-      return
+      });
+      setLoading(false);
+      return;
     }
 
     // Crear usuario
@@ -89,21 +90,22 @@ export default function RegisterPage() {
       preguntaSeguridad: formData.preguntaSeguridad,
       respuestaSeguridad: formData.respuestaSeguridad,
       fechaRegistro: new Date().toISOString(),
-    }
+    };
 
-    saveUser(userData)
+    saveUser(userData);
 
     addToast({
       type: "success",
       title: "¡Registro exitoso!",
-      description: "Usuario registrado correctamente. Ahora puedes iniciar sesión.",
-    })
+      description:
+        "Usuario registrado correctamente. Ahora puedes iniciar sesión.",
+    });
 
-    router.push("/login")
-    setLoading(false)
-  }
+    router.push("/login");
+    setLoading(false);
+  };
 
-  const detectedRole = validateEmailDomain(formData.email)
+  const detectedRole = validateEmailDomain(formData.email);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -128,7 +130,11 @@ export default function RegisterPage() {
             <p className="text-gray-600">Crea tu cuenta institucional</p>
           </div>
 
-          {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -136,7 +142,9 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="Nombres"
                 value={formData.nombres}
-                onChange={(e) => setFormData({ ...formData, nombres: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, nombres: e.target.value })
+                }
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
@@ -144,7 +152,9 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="Apellidos"
                 value={formData.apellidos}
-                onChange={(e) => setFormData({ ...formData, apellidos: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, apellidos: e.target.value })
+                }
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
@@ -154,14 +164,17 @@ export default function RegisterPage() {
               type="email"
               placeholder="Correo institucional"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
               required
             />
 
             {detectedRole && (
               <div className="p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-                Rol detectado: <strong className="capitalize">{detectedRole}</strong>
+                Rol detectado:{" "}
+                <strong className="capitalize">{detectedRole}</strong>
               </div>
             )}
 
@@ -170,7 +183,9 @@ export default function RegisterPage() {
                 type="password"
                 placeholder="Contraseña"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
@@ -178,7 +193,9 @@ export default function RegisterPage() {
                 type="password"
                 placeholder="Confirmar contraseña"
                 value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, confirmPassword: e.target.value })
+                }
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
@@ -188,7 +205,9 @@ export default function RegisterPage() {
             {detectedRole && detectedRole !== "administrador" && (
               <select
                 value={formData.facultad}
-                onChange={(e) => setFormData({ ...formData, facultad: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, facultad: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               >
@@ -202,7 +221,9 @@ export default function RegisterPage() {
                 <option value="Facultad de Ciencias Administrativas, Contables y Comerciales">
                   Facultad de Ciencias Administrativas, Contables y Comerciales
                 </option>
-                <option value="Facultad de Ciencias de la Salud">Facultad de Ciencias de la Salud</option>
+                <option value="Facultad de Ciencias de la Salud">
+                  Facultad de Ciencias de la Salud
+                </option>
                 <option value="Facultad de Ingeniería, Industria y Arquitectura">
                   Facultad de Ingeniería, Industria y Arquitectura
                 </option>
@@ -217,7 +238,9 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="Carrera"
                 value={formData.carrera}
-                onChange={(e) => setFormData({ ...formData, carrera: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, carrera: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
@@ -228,7 +251,9 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="Especialidad"
                 value={formData.especialidad}
-                onChange={(e) => setFormData({ ...formData, especialidad: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, especialidad: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
@@ -236,19 +261,27 @@ export default function RegisterPage() {
 
             <select
               value={formData.preguntaSeguridad}
-              onChange={(e) => setFormData({ ...formData, preguntaSeguridad: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, preguntaSeguridad: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
             >
-              <option value="mascota">¿Cuál es el nombre de tu primera mascota?</option>
+              <option value="mascota">
+                ¿Cuál es el nombre de tu primera mascota?
+              </option>
               <option value="ciudad">¿En qué ciudad naciste?</option>
-              <option value="escuela">¿Cuál es el nombre de tu escuela primaria?</option>
+              <option value="escuela">
+                ¿Cuál es el nombre de tu escuela primaria?
+              </option>
             </select>
 
             <input
               type="text"
               placeholder="Respuesta de seguridad"
               value={formData.respuestaSeguridad}
-              onChange={(e) => setFormData({ ...formData, respuestaSeguridad: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, respuestaSeguridad: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
               required
             />
@@ -265,7 +298,10 @@ export default function RegisterPage() {
           <div className="mt-6 text-center">
             <p className="text-gray-600 text-sm">
               ¿Ya tienes cuenta?{" "}
-              <Link href="/login" className="text-red-600 hover:text-red-700 font-medium">
+              <Link
+                href="/login"
+                className="text-red-600 hover:text-red-700 font-medium"
+              >
                 Iniciar Sesión
               </Link>
             </p>
@@ -273,5 +309,5 @@ export default function RegisterPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

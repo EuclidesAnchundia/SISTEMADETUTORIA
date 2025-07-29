@@ -1,15 +1,24 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { useSystem } from "../../contexts/SystemContext"
-import { useAuth } from "../../contexts/AuthContext"
-import DashboardLayout from "../Layout/DashboardLayout"
-import { Users, BarChart3, Settings, Trash2, UserPlus, Search, AlertTriangle, Edit } from "lucide-react"
-import { useToast } from "../../components/ui/toast"
+import type React from "react";
+import { useState } from "react";
+import { useSystem } from "../../contexts/SystemContext";
+import { useAuth } from "../../contexts/AuthContext";
+import DashboardLayout from "../Layout/DashboardLayout";
+import {
+  Users,
+  BarChart3,
+  Settings,
+  Trash2,
+  UserPlus,
+  Search,
+  AlertTriangle,
+  Edit,
+} from "lucide-react";
+import { useToast } from "../../components/ui/toast";
 
 export default function AdminDashboard() {
-  const [activeSection, setActiveSection] = useState("usuarios")
+  const [activeSection, setActiveSection] = useState("usuarios");
   const {
     users,
     deleteUser,
@@ -21,60 +30,64 @@ export default function AdminDashboard() {
     updateUser,
     createUser,
     assignTutorToStudent,
-  } = useSystem()
-  const { user } = useAuth()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [showCreateForm, setShowCreateForm] = useState(false)
+  } = useSystem();
+  const { user } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [newUser, setNewUser] = useState({
     nombres: "",
     apellidos: "",
     email: "",
     password: "",
-    rol: "estudiante" as "estudiante" | "tutor" | "coordinador" | "administrador",
+    rol: "estudiante" as
+      | "estudiante"
+      | "tutor"
+      | "coordinador"
+      | "administrador",
     facultad: "",
     carrera: "",
     especialidad: "",
-  })
+  });
 
-  const stats = getSystemStats()
+  const stats = getSystemStats();
   const filteredUsers = users.filter(
     (u) =>
       u.nombres.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.apellidos.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  );
 
-  const { addToast } = useToast()
+  const { addToast } = useToast();
 
   const handleDeleteUser = (email: string) => {
     if (window.confirm("¿Estás seguro de que quieres eliminar este usuario?")) {
-      const success = deleteUser(email)
+      const success = deleteUser(email);
       if (success) {
         addToast({
           type: "success",
           title: "Usuario eliminado",
           description: "El usuario ha sido eliminado correctamente.",
-        })
+        });
       } else {
         addToast({
           type: "error",
           title: "Error",
           description: "No se pudo eliminar el usuario.",
-        })
+        });
       }
     }
-  }
+  };
 
   const handleCreateUser = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (getUserByEmail(newUser.email)) {
       addToast({
         type: "error",
         title: "Usuario existente",
         description: "Ya existe un usuario con este correo electrónico.",
-      })
-      return
+      });
+      return;
     }
 
     const userData = {
@@ -83,15 +96,15 @@ export default function AdminDashboard() {
       preguntaSeguridad: "mascota",
       respuestaSeguridad: "admin",
       fechaRegistro: new Date().toISOString(),
-    }
+    };
 
-    const success = createUser(userData)
+    const success = createUser(userData);
     if (success) {
       addToast({
         type: "success",
         title: "Usuario creado",
         description: `Usuario ${newUser.nombres} ${newUser.apellidos} creado correctamente.`,
-      })
+      });
 
       setNewUser({
         nombres: "",
@@ -102,12 +115,12 @@ export default function AdminDashboard() {
         facultad: "",
         carrera: "",
         especialidad: "",
-      })
-      setShowCreateForm(false)
+      });
+      setShowCreateForm(false);
     }
-  }
+  };
 
-  const [editingUser, setEditingUser] = useState<any>(null)
+  const [editingUser, setEditingUser] = useState<any>(null);
   const [editUserForm, setEditUserForm] = useState({
     nombres: "",
     apellidos: "",
@@ -115,10 +128,10 @@ export default function AdminDashboard() {
     facultad: "",
     carrera: "",
     especialidad: "",
-  })
+  });
 
   const handleEditUser = (user: any) => {
-    setEditingUser(user)
+    setEditingUser(user);
     setEditUserForm({
       nombres: user.nombres,
       apellidos: user.apellidos,
@@ -126,36 +139,36 @@ export default function AdminDashboard() {
       facultad: user.facultad || "",
       carrera: user.carrera || "",
       especialidad: user.especialidad || "",
-    })
-  }
+    });
+  };
 
   const handleUpdateUser = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     const updateData: any = {
       nombres: editUserForm.nombres,
       apellidos: editUserForm.apellidos,
       facultad: editUserForm.facultad,
-    }
+    };
 
     if (editUserForm.password) {
-      updateData.password = editUserForm.password
+      updateData.password = editUserForm.password;
     }
 
     if (editingUser.rol === "estudiante") {
-      updateData.carrera = editUserForm.carrera
+      updateData.carrera = editUserForm.carrera;
     } else if (editingUser.rol === "tutor") {
-      updateData.especialidad = editUserForm.especialidad
+      updateData.especialidad = editUserForm.especialidad;
     }
 
-    const success = updateUser(editingUser.email, updateData)
+    const success = updateUser(editingUser.email, updateData);
     if (success) {
       addToast({
         type: "success",
         title: "Usuario actualizado",
         description: `Usuario ${editUserForm.nombres} ${editUserForm.apellidos} actualizado correctamente.`,
-      })
-      setEditingUser(null)
+      });
+      setEditingUser(null);
       setEditUserForm({
         nombres: "",
         apellidos: "",
@@ -163,35 +176,43 @@ export default function AdminDashboard() {
         facultad: "",
         carrera: "",
         especialidad: "",
-      })
+      });
     } else {
       addToast({
         type: "error",
         title: "Error",
         description: "No se pudo actualizar el usuario.",
-      })
+      });
     }
-  }
+  };
 
   const handleResetSystem = () => {
-    if (window.confirm("¿Estás seguro de que quieres reiniciar todo el sistema? Esta acción no se puede deshacer.")) {
-      if (window.confirm("CONFIRMACIÓN FINAL: Se eliminarán TODOS los datos del sistema.")) {
-        resetSystem()
+    if (
+      window.confirm(
+        "¿Estás seguro de que quieres reiniciar todo el sistema? Esta acción no se puede deshacer.",
+      )
+    ) {
+      if (
+        window.confirm(
+          "CONFIRMACIÓN FINAL: Se eliminarán TODOS los datos del sistema.",
+        )
+      ) {
+        resetSystem();
         addToast({
           type: "warning",
           title: "Sistema reiniciado",
           description: "Todos los datos del sistema han sido eliminados.",
           duration: 8000,
-        })
+        });
       }
     }
-  }
+  };
 
   // Asignaciones
-  const [selectedStudent, setSelectedStudent] = useState("")
-  const [selectedTutor, setSelectedTutor] = useState("")
-  const students = users.filter((u) => u.rol === "estudiante")
-  const tutors = users.filter((u) => u.rol === "tutor")
+  const [selectedStudent, setSelectedStudent] = useState("");
+  const [selectedTutor, setSelectedTutor] = useState("");
+  const students = users.filter((u) => u.rol === "estudiante");
+  const tutors = users.filter((u) => u.rol === "tutor");
 
   const handleAssignTutor = () => {
     if (!selectedStudent || !selectedTutor) {
@@ -199,25 +220,25 @@ export default function AdminDashboard() {
         type: "error",
         title: "Selección requerida",
         description: "Debes seleccionar un estudiante y un tutor.",
-      })
-      return
+      });
+      return;
     }
 
-    const success = assignTutorToStudent(selectedStudent, selectedTutor)
+    const success = assignTutorToStudent(selectedStudent, selectedTutor);
     if (success) {
-      const student = students.find((s) => s.id === selectedStudent)
-      const tutor = tutors.find((t) => t.id === selectedTutor)
+      const student = students.find((s) => s.id === selectedStudent);
+      const tutor = tutors.find((t) => t.id === selectedTutor);
 
       addToast({
         type: "success",
         title: "Asignación exitosa",
         description: `${student?.nombres} ${student?.apellidos} ha sido asignado a ${tutor?.nombres} ${tutor?.apellidos}`,
-      })
+      });
 
-      setSelectedStudent("")
-      setSelectedTutor("")
+      setSelectedStudent("");
+      setSelectedTutor("");
     }
-  }
+  };
 
   const sidebar = (
     <ul className="space-y-2">
@@ -225,7 +246,9 @@ export default function AdminDashboard() {
         <button
           onClick={() => setActiveSection("usuarios")}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
-            activeSection === "usuarios" ? "bg-red-100 text-red-700" : "text-gray-700 hover:bg-gray-100"
+            activeSection === "usuarios"
+              ? "bg-red-100 text-red-700"
+              : "text-gray-700 hover:bg-gray-100"
           }`}
         >
           <Users size={20} />
@@ -236,7 +259,9 @@ export default function AdminDashboard() {
         <button
           onClick={() => setActiveSection("asignaciones")}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
-            activeSection === "asignaciones" ? "bg-red-100 text-red-700" : "text-gray-700 hover:bg-gray-100"
+            activeSection === "asignaciones"
+              ? "bg-red-100 text-red-700"
+              : "text-gray-700 hover:bg-gray-100"
           }`}
         >
           <UserPlus size={20} />
@@ -247,7 +272,9 @@ export default function AdminDashboard() {
         <button
           onClick={() => setActiveSection("estadisticas")}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
-            activeSection === "estadisticas" ? "bg-red-100 text-red-700" : "text-gray-700 hover:bg-gray-100"
+            activeSection === "estadisticas"
+              ? "bg-red-100 text-red-700"
+              : "text-gray-700 hover:bg-gray-100"
           }`}
         >
           <BarChart3 size={20} />
@@ -258,7 +285,9 @@ export default function AdminDashboard() {
         <button
           onClick={() => setActiveSection("configuracion")}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
-            activeSection === "configuracion" ? "bg-red-100 text-red-700" : "text-gray-700 hover:bg-gray-100"
+            activeSection === "configuracion"
+              ? "bg-red-100 text-red-700"
+              : "text-gray-700 hover:bg-gray-100"
           }`}
         >
           <Settings size={20} />
@@ -266,7 +295,7 @@ export default function AdminDashboard() {
         </button>
       </li>
     </ul>
-  )
+  );
 
   const renderContent = () => {
     switch (activeSection) {
@@ -274,7 +303,9 @@ export default function AdminDashboard() {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h2>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Gestión de Usuarios
+              </h2>
               <button
                 onClick={() => setShowCreateForm(true)}
                 className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 flex items-center gap-2"
@@ -287,7 +318,10 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-lg shadow p-6">
               <div className="mb-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <Search
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={20}
+                  />
                   <input
                     type="text"
                     placeholder="Buscar usuarios..."
@@ -327,7 +361,9 @@ export default function AdminDashboard() {
                             {usuario.nombres} {usuario.apellidos}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{usuario.email}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {usuario.email}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -376,19 +412,32 @@ export default function AdminDashboard() {
             {showCreateForm && (
               <div className="fixed inset-0 z-50 overflow-y-auto">
                 <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
-                  <div className="fixed inset-0 transition-opacity" onClick={() => setShowCreateForm(false)}>
+                  <div
+                    className="fixed inset-0 transition-opacity"
+                    onClick={() => setShowCreateForm(false)}
+                  >
                     <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
                   </div>
                   <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <form onSubmit={handleCreateUser} className="bg-white px-4 pt-5 pb-4 sm:p-6">
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">Crear Nuevo Usuario</h3>
+                    <form
+                      onSubmit={handleCreateUser}
+                      className="bg-white px-4 pt-5 pb-4 sm:p-6"
+                    >
+                      <h3 className="text-lg font-medium text-gray-900 mb-4">
+                        Crear Nuevo Usuario
+                      </h3>
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <input
                             type="text"
                             placeholder="Nombres"
                             value={newUser.nombres}
-                            onChange={(e) => setNewUser({ ...newUser, nombres: e.target.value })}
+                            onChange={(e) =>
+                              setNewUser({
+                                ...newUser,
+                                nombres: e.target.value,
+                              })
+                            }
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                             required
                           />
@@ -396,7 +445,12 @@ export default function AdminDashboard() {
                             type="text"
                             placeholder="Apellidos"
                             value={newUser.apellidos}
-                            onChange={(e) => setNewUser({ ...newUser, apellidos: e.target.value })}
+                            onChange={(e) =>
+                              setNewUser({
+                                ...newUser,
+                                apellidos: e.target.value,
+                              })
+                            }
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                             required
                           />
@@ -405,7 +459,9 @@ export default function AdminDashboard() {
                           type="email"
                           placeholder="Email"
                           value={newUser.email}
-                          onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                          onChange={(e) =>
+                            setNewUser({ ...newUser, email: e.target.value })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                           required
                         />
@@ -413,13 +469,20 @@ export default function AdminDashboard() {
                           type="password"
                           placeholder="Contraseña"
                           value={newUser.password}
-                          onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                          onChange={(e) =>
+                            setNewUser({ ...newUser, password: e.target.value })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                           required
                         />
                         <select
                           value={newUser.rol}
-                          onChange={(e) => setNewUser({ ...newUser, rol: e.target.value as any })}
+                          onChange={(e) =>
+                            setNewUser({
+                              ...newUser,
+                              rol: e.target.value as any,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                         >
                           <option value="estudiante">Estudiante</option>
@@ -431,7 +494,9 @@ export default function AdminDashboard() {
                           type="text"
                           placeholder="Facultad"
                           value={newUser.facultad}
-                          onChange={(e) => setNewUser({ ...newUser, facultad: e.target.value })}
+                          onChange={(e) =>
+                            setNewUser({ ...newUser, facultad: e.target.value })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                         />
                         {newUser.rol === "estudiante" && (
@@ -439,16 +504,27 @@ export default function AdminDashboard() {
                             type="text"
                             placeholder="Carrera"
                             value={newUser.carrera}
-                            onChange={(e) => setNewUser({ ...newUser, carrera: e.target.value })}
+                            onChange={(e) =>
+                              setNewUser({
+                                ...newUser,
+                                carrera: e.target.value,
+                              })
+                            }
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                           />
                         )}
-                        {(newUser.rol === "tutor" || newUser.rol === "coordinador") && (
+                        {(newUser.rol === "tutor" ||
+                          newUser.rol === "coordinador") && (
                           <input
                             type="text"
                             placeholder="Especialidad"
                             value={newUser.especialidad}
-                            onChange={(e) => setNewUser({ ...newUser, especialidad: e.target.value })}
+                            onChange={(e) =>
+                              setNewUser({
+                                ...newUser,
+                                especialidad: e.target.value,
+                              })
+                            }
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                           />
                         )}
@@ -461,7 +537,10 @@ export default function AdminDashboard() {
                         >
                           Cancelar
                         </button>
-                        <button type="submit" className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                        <button
+                          type="submit"
+                          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                        >
                           Crear Usuario
                         </button>
                       </div>
@@ -475,19 +554,32 @@ export default function AdminDashboard() {
             {editingUser && (
               <div className="fixed inset-0 z-50 overflow-y-auto">
                 <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
-                  <div className="fixed inset-0 transition-opacity" onClick={() => setEditingUser(null)}>
+                  <div
+                    className="fixed inset-0 transition-opacity"
+                    onClick={() => setEditingUser(null)}
+                  >
                     <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
                   </div>
                   <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <form onSubmit={handleUpdateUser} className="bg-white px-4 pt-5 pb-4 sm:p-6">
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">Editar Usuario</h3>
+                    <form
+                      onSubmit={handleUpdateUser}
+                      className="bg-white px-4 pt-5 pb-4 sm:p-6"
+                    >
+                      <h3 className="text-lg font-medium text-gray-900 mb-4">
+                        Editar Usuario
+                      </h3>
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <input
                             type="text"
                             placeholder="Nombres"
                             value={editUserForm.nombres}
-                            onChange={(e) => setEditUserForm({ ...editUserForm, nombres: e.target.value })}
+                            onChange={(e) =>
+                              setEditUserForm({
+                                ...editUserForm,
+                                nombres: e.target.value,
+                              })
+                            }
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                             required
                           />
@@ -495,7 +587,12 @@ export default function AdminDashboard() {
                             type="text"
                             placeholder="Apellidos"
                             value={editUserForm.apellidos}
-                            onChange={(e) => setEditUserForm({ ...editUserForm, apellidos: e.target.value })}
+                            onChange={(e) =>
+                              setEditUserForm({
+                                ...editUserForm,
+                                apellidos: e.target.value,
+                              })
+                            }
                             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                             required
                           />
@@ -510,12 +607,22 @@ export default function AdminDashboard() {
                           type="password"
                           placeholder="Nueva contraseña (opcional)"
                           value={editUserForm.password}
-                          onChange={(e) => setEditUserForm({ ...editUserForm, password: e.target.value })}
+                          onChange={(e) =>
+                            setEditUserForm({
+                              ...editUserForm,
+                              password: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                         />
                         <select
                           value={editUserForm.facultad}
-                          onChange={(e) => setEditUserForm({ ...editUserForm, facultad: e.target.value })}
+                          onChange={(e) =>
+                            setEditUserForm({
+                              ...editUserForm,
+                              facultad: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                           required
                         >
@@ -527,9 +634,12 @@ export default function AdminDashboard() {
                             Facultad de Educación, Turismo, Artes y Humanidades
                           </option>
                           <option value="Facultad de Ciencias Administrativas, Contables y Comerciales">
-                            Facultad de Ciencias Administrativas, Contables y Comerciales
+                            Facultad de Ciencias Administrativas, Contables y
+                            Comerciales
                           </option>
-                          <option value="Facultad de Ciencias de la Salud">Facultad de Ciencias de la Salud</option>
+                          <option value="Facultad de Ciencias de la Salud">
+                            Facultad de Ciencias de la Salud
+                          </option>
                           <option value="Facultad de Ingeniería, Industria y Arquitectura">
                             Facultad de Ingeniería, Industria y Arquitectura
                           </option>
@@ -542,7 +652,12 @@ export default function AdminDashboard() {
                             type="text"
                             placeholder="Carrera"
                             value={editUserForm.carrera}
-                            onChange={(e) => setEditUserForm({ ...editUserForm, carrera: e.target.value })}
+                            onChange={(e) =>
+                              setEditUserForm({
+                                ...editUserForm,
+                                carrera: e.target.value,
+                              })
+                            }
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                             required
                           />
@@ -552,7 +667,12 @@ export default function AdminDashboard() {
                             type="text"
                             placeholder="Especialidad"
                             value={editUserForm.especialidad}
-                            onChange={(e) => setEditUserForm({ ...editUserForm, especialidad: e.target.value })}
+                            onChange={(e) =>
+                              setEditUserForm({
+                                ...editUserForm,
+                                especialidad: e.target.value,
+                              })
+                            }
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                             required
                           />
@@ -566,7 +686,10 @@ export default function AdminDashboard() {
                         >
                           Cancelar
                         </button>
-                        <button type="submit" className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                        <button
+                          type="submit"
+                          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                        >
                           Actualizar Usuario
                         </button>
                       </div>
@@ -576,18 +699,24 @@ export default function AdminDashboard() {
               </div>
             )}
           </div>
-        )
+        );
 
       case "asignaciones":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Asignación Global de Tutores</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Asignación Global de Tutores
+            </h2>
 
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Nueva Asignación</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Nueva Asignación
+              </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Estudiante</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Seleccionar Estudiante
+                  </label>
                   <select
                     value={selectedStudent}
                     onChange={(e) => setSelectedStudent(e.target.value)}
@@ -596,13 +725,16 @@ export default function AdminDashboard() {
                     <option value="">Seleccionar estudiante...</option>
                     {students.map((student) => (
                       <option key={student.id} value={student.id}>
-                        {student.nombres} {student.apellidos} - {student.carrera} ({student.facultad})
+                        {student.nombres} {student.apellidos} -{" "}
+                        {student.carrera} ({student.facultad})
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Tutor</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Seleccionar Tutor
+                  </label>
                   <select
                     value={selectedTutor}
                     onChange={(e) => setSelectedTutor(e.target.value)}
@@ -611,7 +743,8 @@ export default function AdminDashboard() {
                     <option value="">Seleccionar tutor...</option>
                     {tutors.map((tutor) => (
                       <option key={tutor.id} value={tutor.id}>
-                        {tutor.nombres} {tutor.apellidos} - {tutor.especialidad} ({tutor.facultad})
+                        {tutor.nombres} {tutor.apellidos} - {tutor.especialidad}{" "}
+                        ({tutor.facultad})
                       </option>
                     ))}
                   </select>
@@ -625,12 +758,14 @@ export default function AdminDashboard() {
               </button>
             </div>
           </div>
-        )
+        );
 
       case "estadisticas":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Estadísticas del Sistema</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Estadísticas del Sistema
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white p-6 rounded-lg shadow">
@@ -639,8 +774,12 @@ export default function AdminDashboard() {
                     <Users className="text-blue-600" size={24} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Total Usuarios</p>
-                    <p className="text-2xl font-semibold text-gray-900">{stats.totalUsers}</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      Total Usuarios
+                    </p>
+                    <p className="text-2xl font-semibold text-gray-900">
+                      {stats.totalUsers}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -651,8 +790,12 @@ export default function AdminDashboard() {
                     <Users className="text-green-600" size={24} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Estudiantes</p>
-                    <p className="text-2xl font-semibold text-gray-900">{stats.totalStudents}</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      Estudiantes
+                    </p>
+                    <p className="text-2xl font-semibold text-gray-900">
+                      {stats.totalStudents}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -664,7 +807,9 @@ export default function AdminDashboard() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-500">Tutores</p>
-                    <p className="text-2xl font-semibold text-gray-900">{stats.totalTutors}</p>
+                    <p className="text-2xl font-semibold text-gray-900">
+                      {stats.totalTutors}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -675,8 +820,12 @@ export default function AdminDashboard() {
                     <Users className="text-purple-600" size={24} />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Coordinadores</p>
-                    <p className="text-2xl font-semibold text-gray-900">{stats.totalCoordinators}</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      Coordinadores
+                    </p>
+                    <p className="text-2xl font-semibold text-gray-900">
+                      {stats.totalCoordinators}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -684,7 +833,9 @@ export default function AdminDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Tutorías</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  Tutorías
+                </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total:</span>
@@ -692,13 +843,17 @@ export default function AdminDashboard() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Completadas:</span>
-                    <span className="font-semibold text-green-600">{stats.completedTutorias}</span>
+                    <span className="font-semibold text-green-600">
+                      {stats.completedTutorias}
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Contenido</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  Contenido
+                </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Temas:</span>
@@ -712,24 +867,32 @@ export default function AdminDashboard() {
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Actividad por Facultad</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  Actividad por Facultad
+                </h3>
                 <div className="space-y-2">
-                  {Object.entries(stats.facultiesActivity).map(([facultad, count]) => (
-                    <div key={facultad} className="flex justify-between">
-                      <span className="text-gray-600 text-sm">{facultad}:</span>
-                      <span className="font-semibold">{count}</span>
-                    </div>
-                  ))}
+                  {Object.entries(stats.facultiesActivity).map(
+                    ([facultad, count]) => (
+                      <div key={facultad} className="flex justify-between">
+                        <span className="text-gray-600 text-sm">
+                          {facultad}:
+                        </span>
+                        <span className="font-semibold">{count}</span>
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
             </div>
           </div>
-        )
+        );
 
       case "configuracion":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Configuración del Sistema</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Configuración del Sistema
+            </h2>
 
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="flex items-start gap-4">
@@ -737,10 +900,13 @@ export default function AdminDashboard() {
                   <AlertTriangle className="text-red-600" size={24} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Reiniciar Sistema</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Reiniciar Sistema
+                  </h3>
                   <p className="text-gray-600 mb-4">
-                    Esta acción eliminará todos los datos del sistema incluyendo usuarios, tutorías, temas, archivos y
-                    notificaciones. Esta acción no se puede deshacer.
+                    Esta acción eliminará todos los datos del sistema incluyendo
+                    usuarios, tutorías, temas, archivos y notificaciones. Esta
+                    acción no se puede deshacer.
                   </p>
                   <button
                     onClick={handleResetSystem}
@@ -754,7 +920,9 @@ export default function AdminDashboard() {
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Información del Sistema</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Información del Sistema
+              </h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-600">Versión:</span>
@@ -777,12 +945,12 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
-        )
+        );
 
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <DashboardLayout
@@ -799,5 +967,5 @@ export default function AdminDashboard() {
     >
       {renderContent()}
     </DashboardLayout>
-  )
+  );
 }
