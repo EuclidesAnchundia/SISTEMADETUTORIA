@@ -1,22 +1,26 @@
-"use client"
+"use client";
 
-import { type ReactNode, useState } from "react"
-import { useAuth } from "../../contexts/AuthContext"
-import { useNotifications } from "../../hooks/useNotifications"
-import { Bell, Menu, X, LogOut } from "lucide-react"
-import NotificationModal from "../Modals/NotificationModal"
+import { type ReactNode, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNotifications } from "../../hooks/useNotifications";
+import { Bell, Menu, X, LogOut } from "lucide-react";
+import NotificationModal from "../Modals/NotificationModal";
 
 interface DashboardLayoutProps {
-  children: ReactNode
-  sidebar: ReactNode
-  title: string
+  children: ReactNode;
+  sidebar: ReactNode;
+  title: string;
 }
 
-export default function DashboardLayout({ children, sidebar, title }: DashboardLayoutProps) {
-  const { user, logout } = useAuth()
-  const { unreadCount } = useNotifications()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [notificationsOpen, setNotificationsOpen] = useState(false)
+export default function DashboardLayout({
+  children,
+  sidebar,
+  title,
+}: DashboardLayoutProps) {
+  const { user, logout } = useAuth();
+  const { unreadCount } = useNotifications();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -29,11 +33,19 @@ export default function DashboardLayout({ children, sidebar, title }: DashboardL
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-white font-bold">
-              {user?.rol === "estudiante" ? "E" : user?.rol === "tutor" ? "T" : user?.rol === "coordinador" ? "C" : "A"}
+              {user?.rol === "estudiante"
+                ? "E"
+                : user?.rol === "tutor"
+                  ? "T"
+                  : user?.rol === "coordinador"
+                    ? "C"
+                    : "A"}
             </div>
             <div>
               <h2 className="font-bold text-gray-900">ULEAM</h2>
-              <p className="text-xs text-gray-500 capitalize">Panel {user?.rol}</p>
+              <p className="text-xs text-gray-500 capitalize">
+                Panel {user?.rol}
+              </p>
             </div>
           </div>
           <button
@@ -97,11 +109,17 @@ export default function DashboardLayout({ children, sidebar, title }: DashboardL
 
       {/* Overlay for mobile sidebar */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
       {/* Notifications Modal */}
-      <NotificationModal isOpen={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
+      <NotificationModal
+        isOpen={notificationsOpen}
+        onClose={() => setNotificationsOpen(false)}
+      />
     </div>
-  )
+  );
 }

@@ -1,42 +1,42 @@
-"use client"
+"use client";
 
-import { useAuth } from "../contexts/AuthContext"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-import StudentDashboard from "../components/dashboards/StudentDashboard"
-import TutorDashboard from "../components/dashboards/TutorDashboard"
-import CoordinatorDashboard from "../components/dashboards/CoordinatorDashboard"
-import AdminDashboard from "../components/dashboards/AdminDashboard"
-import LoadingSpinner from "../components/LoadingSpinner"
+import { useAuth } from "../contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import StudentDashboard from "../components/dashboards/StudentDashboard";
+import TutorDashboard from "../components/dashboards/TutorDashboard";
+import CoordinatorDashboard from "../components/dashboards/CoordinatorDashboard";
+import AdminDashboard from "../components/dashboards/AdminDashboard";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function DashboardPage() {
-  const { user, loading } = useAuth()
-  const router = useRouter()
+  const { user, loading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login")
+      router.push("/login");
     }
-  }, [user, loading, router])
+  }, [user, loading, router]);
 
   if (loading) {
-    return <LoadingSpinner />
+    return <LoadingSpinner />;
   }
 
   if (!user) {
-    return <LoadingSpinner />
+    return <LoadingSpinner />;
   }
 
   switch (user.rol) {
     case "estudiante":
-      return <StudentDashboard />
+      return <StudentDashboard />;
     case "tutor":
-      return <TutorDashboard />
+      return <TutorDashboard />;
     case "coordinador":
-      return <CoordinatorDashboard />
+      return <CoordinatorDashboard />;
     case "administrador":
-      return <AdminDashboard />
+      return <AdminDashboard />;
     default:
-      return <div>Rol no reconocido</div>
+      return <div>Rol no reconocido</div>;
   }
 }

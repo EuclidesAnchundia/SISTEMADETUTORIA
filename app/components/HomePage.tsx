@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
 import {
   Users,
   Calendar,
@@ -10,7 +10,7 @@ import {
   ClapperboardIcon as ChalkboardTeacher,
   UserIcon as UserTie,
   GraduationCap,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -32,9 +32,12 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto">
           {/* Welcome Section */}
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Bienvenido al Sistema de Tutorías</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Bienvenido al Sistema de Tutorías
+            </h2>
             <p className="text-xl text-gray-600 mb-8">
-              Plataforma integral para la gestión eficiente de tutorías de titulación
+              Plataforma integral para la gestión eficiente de tutorías de
+              titulación
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -55,40 +58,65 @@ export default function HomePage() {
 
           {/* Features Section */}
           <div className="mb-12">
-            <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">Características del Sistema</h3>
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">
+              Características del Sistema
+            </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white p-6 rounded-lg shadow-md text-center">
                 <Users className="mx-auto mb-4 text-red-600" size={48} />
-                <h4 className="font-semibold text-gray-900 mb-2">Gestión de Usuarios</h4>
-                <p className="text-gray-600 text-sm">Registro automático por roles según correo institucional</p>
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Gestión de Usuarios
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  Registro automático por roles según correo institucional
+                </p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md text-center">
                 <Calendar className="mx-auto mb-4 text-red-600" size={48} />
-                <h4 className="font-semibold text-gray-900 mb-2">Programación de Tutorías</h4>
-                <p className="text-gray-600 text-sm">Sistema completo de solicitud y gestión de tutorías</p>
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Programación de Tutorías
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  Sistema completo de solicitud y gestión de tutorías
+                </p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md text-center">
                 <FileText className="mx-auto mb-4 text-red-600" size={48} />
-                <h4 className="font-semibold text-gray-900 mb-2">Gestión de Archivos</h4>
-                <p className="text-gray-600 text-sm">Subida y revisión de documentos PDF</p>
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Gestión de Archivos
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  Subida y revisión de documentos PDF
+                </p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md text-center">
                 <BarChart3 className="mx-auto mb-4 text-red-600" size={48} />
-                <h4 className="font-semibold text-gray-900 mb-2">Seguimiento de Progreso</h4>
-                <p className="text-gray-600 text-sm">Monitoreo completo del avance académico</p>
+                <h4 className="font-semibold text-gray-900 mb-2">
+                  Seguimiento de Progreso
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  Monitoreo completo del avance académico
+                </p>
               </div>
             </div>
           </div>
 
           {/* Roles Section - Solo 3 roles visibles */}
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">Roles del Sistema</h3>
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">
+              Roles del Sistema
+            </h3>
             <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="text-center mb-4">
-                  <UserGraduate className="mx-auto mb-2 text-red-600" size={48} />
+                  <UserGraduate
+                    className="mx-auto mb-2 text-red-600"
+                    size={48}
+                  />
                   <h4 className="font-semibold text-gray-900">Estudiante</h4>
-                  <p className="text-sm text-red-600 font-medium">@live.uleam.edu.ec</p>
+                  <p className="text-sm text-red-600 font-medium">
+                    @live.uleam.edu.ec
+                  </p>
                 </div>
                 <ul className="text-sm text-gray-600 space-y-1">
                   <li>• Proponer tema de titulación</li>
@@ -100,9 +128,14 @@ export default function HomePage() {
 
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="text-center mb-4">
-                  <ChalkboardTeacher className="mx-auto mb-2 text-red-600" size={48} />
+                  <ChalkboardTeacher
+                    className="mx-auto mb-2 text-red-600"
+                    size={48}
+                  />
                   <h4 className="font-semibold text-gray-900">Tutor</h4>
-                  <p className="text-sm text-red-600 font-medium">@uleam.edu.ec</p>
+                  <p className="text-sm text-red-600 font-medium">
+                    @uleam.edu.ec
+                  </p>
                 </div>
                 <ul className="text-sm text-gray-600 space-y-1">
                   <li>• Gestionar tutorías</li>
@@ -116,7 +149,9 @@ export default function HomePage() {
                 <div className="text-center mb-4">
                   <UserTie className="mx-auto mb-2 text-red-600" size={48} />
                   <h4 className="font-semibold text-gray-900">Coordinador</h4>
-                  <p className="text-sm text-red-600 font-medium">@coordtit.uleam.edu.ec</p>
+                  <p className="text-sm text-red-600 font-medium">
+                    @coordtit.uleam.edu.ec
+                  </p>
                 </div>
                 <ul className="text-sm text-gray-600 space-y-1">
                   <li>• Asignar tutores</li>
@@ -137,5 +172,5 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
